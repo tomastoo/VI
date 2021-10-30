@@ -1,20 +1,24 @@
+var table_1_incidents_src = "data/table1-Incidentes.csv";
+var table_1_offenses_src = "data/table1-Offenses.csv";
+var table_1_victims_src = "data/table1-Victims.csv";
+var table_1_offenders_src = "data/table1-Known Offender.csv";
+
 var table_11_incidents_src = "data/table11-Incidents.csv";
 var table_11_offenses_src = "data/table11-Offenses.csv";
-var table_1_offenses_src = "data/table1-Offenses.csv";
 var map = "data/countries-110m.json";
 
 var topology;
 
-Promise.all([
-  d3.json(map),
-  d3.csv(table_11_offenses_src),
-  d3.csv(table_1_offenses_src),
-]).then(function ([map, table_11_offenses, table_1_offenses]) {
+Promise.all([d3.json(map), d3.csv(table_1_offenses_src)]).then(function ([
+  map,
+  table_1_offenses,
+]) {
   topology = map;
-  //console.log(table_11_offenses);
-  //console.log(map);
+  console.log(table_1_offenses);
+  console.log(map);
   //trableReformatYearsSingleBias(table_11_offenses[1]);
-  createLineChart(table_11_offenses);
+  createLineChart(table_1_offenses, false);
+  handleLineChartClick(null, "2019");
   createBarChart(table_1_offenses, false, 2019);
 });
 
@@ -34,7 +38,41 @@ function trableReformatYearsSingleBias(data) {
   return out;
 }
 
-function createLineChart(table_11) {
+function changeViewNewData(button) {
+  switch (button) {
+    case "victims":
+      Promise.all([d3.csv(table_1_victims_src)]).then(function ([
+        table_1_victims,
+      ]) {
+        createLineChart(table_1_victims, true);
+      });
+      break;
+    case "offenders":
+      Promise.all([d3.csv(table_1_offenders_src)]).then(function ([
+        table_1_offenders,
+      ]) {
+        createLineChart(table_1_offenders, true);
+      });
+      break;
+
+    case "offenses":
+      Promise.all([d3.csv(table_1_offenses_src)]).then(function ([
+        table_1_offenses,
+      ]) {
+        createLineChart(table_1_offenses, true);
+      });
+      break;
+    case "incidents":
+      Promise.all([d3.csv(table_1_incidents_src)]).then(function ([
+        table_1_incidents,
+      ]) {
+        createLineChart(table_1_incidents, true);
+      });
+      break;
+  }
+}
+
+function createLineChart(table_11, update) {
   const width = 1450;
   const height = 150;
   margin = { top: 10, right: 15, bottom: 20, left: 35 };
@@ -60,7 +98,6 @@ function createLineChart(table_11) {
       })
     )
     .range([margin.left, width - margin.right]);
-
   // 0 to max
   y = d3
     .scaleLinear()
@@ -78,64 +115,164 @@ function createLineChart(table_11) {
   function yAxis(g) {
     g.attr("transform", `translate(${margin.left}, 0)`)
       .call(
-        d3
-          .axisLeft(y)
-          .tickFormat((i) => i)
-          .ticks(4)
+        d3.axisLeft(y).tickFormat((i) => i)
+        //.ticks(4)
       )
       .call((g) => g.select(".domain").remove());
   }
 
+  if (!update) {
+    d3.select("div#lineChart")
+      .append("svg")
+      .append("g")
+      .attr("class", "line")
+      .attr("fill", "steelblue")
+      .append("path");
+  }
+
   const svg = d3
     .select("div#lineChart")
-    .append("svg")
+    .select("svg")
     .attr("width", width)
     .attr("height", height);
 
-  svg.append("g").call(xAxis);
-  svg.append("g").call(yAxis);
+  if (!update) {
+    svg.append("g").attr("class", "lineXAxis");
+    svg.append("g").attr("class", "lineYAxis");
+  }
+
+  svg.select("g.lineXAxis").call(xAxis);
+  svg.select("g.lineYAxis").call(yAxis);
+  d3.select(".lineXAxis").selectAll(".tick").on("click", handleLineChartClick);
+  d3.select(".lineXAxis").selectAll("text").style("font-size", 14);
 
   // datum picks all the data
   // if we wanted more than one line (more than one dataset) then we would need
   // to use the data() method
   svg
-    //  .append("g#line")
-    .append("path")
+    .select("path")
     .datum(data)
     .attr("fill", "none")
-    .attr("stroke", "steelblue")
+    .attr("stroke", "red")
     .attr("stroke-width", 1.5)
     // to lines above are not needed for this case said the dude on the video
     // .attr("stroke-linejoin", "round")
     // .attr("stroke-linecap", "round")
     .attr("d", line);
 
-  data = data.filter(function (dataItem) {
-    if (dataItem.total >= 0) return dataItem;
-  });
-  const extent = d3.extent(data, (d) => d.total);
-  const extentMaxYear = d3.maxIndex(data, (d) => d.total);
-  const extentMinYear = d3.minIndex(data, (d) => d.total);
-
-  //console.log(data[extentMaxYear].year);
-  //console.log(data[extentMinYear].year);
-  //console.log(extent);
-
   svg
-    .append("circle")
-    .attr("stroke", "steelblue")
-    .attr("stroke-width", 1.5)
-    .attr("cx", x(data[extentMaxYear].year))
-    .attr("cy", y(extent[1]))
-    .attr("r", 3);
+    .select("g.line")
+    .selectAll("circle")
+    .data(data, function (d) {
+      console.log(d);
+      return d.year;
+    })
+    .join(
+      (enter) => {
+        return (
+          enter
+            .append("circle")
+            .attr("stroke", "black")
+            .attr("fill", "black")
+            // .attr("stroke-width", 1.5)
+            .attr("cx", (d) => x(d.year))
+            .attr("cy", (d) => y(d.total))
+            .attr("r", 5)
+            .on("click", handleLineChartClick)
+        );
+        //.on("mouseover", handleMouseHover)
+        //.on("moseleave", handleMouseLeave)
+      },
+      (update) => {
+        update
+          .attr("cx", (d) => x(d.year))
+          .attr("cy", (d) => y(d.total))
+          .attr("r", 5);
+      },
+      (exit) => {
+        exit.remove();
+      }
+    );
+}
 
-  svg
-    .append("circle")
-    .attr("stroke", "steelblue")
-    .attr("stroke-width", 1.5)
-    .attr("cx", x(data[extentMinYear].year))
-    .attr("cy", y(extent[0]))
-    .attr("r", 3);
+var selectedYears = [];
+
+function handleLineChartClick(event, d) {
+  console.log(selectedYears.length);
+  console.log(typeof selectedYears.length);
+
+  // Primeiro vou filtrar todas as selections
+  if (selectedYears.length != 0) {
+    selectedYears.forEach(function (year, index) {
+      clearLineChartSelections(year);
+    });
+  }
+
+  // vou chamar o desenho do linechart tal e o eixo dos x porque quero
+  //     meter a bold e noutra cor o texto
+  lineChart = d3.select("div#lineChart").select("svg");
+  lineChartXaxis = d3.select(".lineXAxis");
+
+  // Visto que a data pode vir do eixo dos anos como pode vir da bolinha
+  // depende onde clicamos entao temos de uniformizar a coisa.
+  var clickedYear;
+  if (d.year != null) {
+    clickedYear = d.year;
+  } else {
+    clickedYear = d;
+  }
+
+  //console.log(clickedYear);
+  // se o ano clicado ja tiver selecionado vou apagar so
+  if (selectedYears.indexOf(clickedYear) === -1) {
+    selectedYears.push(clickedYear);
+    lineChart
+      .selectAll("circle")
+      .filter(function (c) {
+        console.log(c);
+        if (clickedYear == c.year || clickedYear == c) {
+          return c;
+        }
+      })
+      .style("fill", "orange")
+      .attr("r", 8);
+
+    lineChartXaxis
+      .selectAll("text")
+      .filter(function (c) {
+        console.log(c);
+        if (clickedYear == c.year || clickedYear == c) {
+          return c;
+        }
+      })
+      .attr("class", "text-danger")
+      .style("font-weight", "bold");
+  } else {
+    clearLineChartSelections(clickedYear);
+  }
+}
+
+function clearLineChartSelections(year) {
+  selectedYears.splice(selectedYears.indexOf(year), 1);
+  lineChart
+    .selectAll("circle")
+    .filter(function (c) {
+      if (year == c.year || year == c) {
+        return c;
+      }
+    })
+    .style("fill", "black")
+    .attr("r", 5);
+
+  lineChartXaxis
+    .selectAll("text")
+    .filter(function (c) {
+      if (year == c.year || year == c) {
+        return c;
+      }
+    })
+    .attr("class", "text-dark")
+    .style("font-weight", "");
 }
 
 /***********************************************************************************/
