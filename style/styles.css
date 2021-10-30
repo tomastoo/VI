@@ -1,0 +1,7 @@
+div {
+  width: 100%;
+  float: left;
+}
+.tooltip {
+  position: relative;
+}
