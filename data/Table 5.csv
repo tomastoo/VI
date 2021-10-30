@@ -1,0 +1,44 @@
+Bias motivation,Total offenses,White,Black or African American,American Indian or Alaska Native,Asian,Native Hawaiian or Other Pacific Islander,Group of multiple races,Unknown race,Hispanic or Latino,Not Hispanic or Latino,Group of multiple ethnicities,Unknown ethnicity,Unknown offender
+Total,8559,3564,1385,76,57,19,268,784,504,1862,71,2775,2406
+Single-Bias Incidents,8302,3456,1366,75,57,19,262,780,496,1806,69,2703,2287
+Race/Ethnicity/Ancestry:,4784,2320,745,65,39,15,169,243,267,1194,49,1713,1188
+Anti-White,755,198,318,21,5,7,23,24,38,182,5,314,159
+Anti-Black or African American,2314,1325,116,15,19,5,101,142,137,622,14,786,591
+Anti-American Indian or Alaska Native,126,61,17,6,0,0,2,2,12,30,1,44,38
+Anti-Asian,205,95,30,2,7,1,18,3,7,46,6,70,49
+Anti-Native Hawaiian or Other Pacific Islander,25,11,7,1,0,1,1,0,1,5,0,15,4
+"Anti-Multiple Races, Group",171,76,18,5,1,0,1,5,5,36,0,55,65
+Anti-Arab,122,59,24,0,0,0,2,9,4,18,0,55,28
+Anti-Hispanic or Latino,676,342,150,8,4,1,15,33,44,212,22,198,123
+Anti-Other Race/Ethnicity/Ancestry,390,153,65,7,3,0,6,25,19,43,1,176,131
+Religion:,1650,452,115,2,11,1,31,346,37,229,7,293,692
+Anti-Jewish,995,172,37,0,3,0,22,302,9,79,6,104,459
+Anti-Catholic,66,21,9,0,1,0,1,7,4,11,0,16,27
+Anti-Protestant,24,9,2,0,0,0,0,1,3,4,0,5,12
+Anti-Islamic (Muslim),219,108,38,0,6,1,3,14,13,59,1,63,49
+Anti-Other Religion,108,46,6,0,0,0,1,9,3,19,0,37,46
+"Anti-Multiple Religions, Group",42,16,4,0,0,0,1,4,1,10,0,11,17
+Anti-Mormon,14,8,0,0,0,0,0,0,1,6,0,0,6
+Anti-Jehovah's Witness,7,1,2,0,0,0,1,1,0,3,0,1,2
+"Anti-Eastern Orthodox (Russian, Greek, Other)",47,26,2,0,0,0,2,0,1,13,0,16,17
+Anti-Other Christian,60,23,1,0,0,0,0,5,0,8,0,19,31
+Anti-Buddhist,5,2,0,0,0,0,0,2,0,0,0,2,1
+Anti-Hindu,7,2,1,0,0,0,0,0,0,1,0,2,4
+Anti-Sikh,50,15,12,2,1,0,0,1,2,14,0,15,19
+Anti-Atheism/Agnosticism/etc.,6,3,1,0,0,0,0,0,0,2,0,2,2
+Sexual Orientation:,1395,502,379,6,7,3,51,140,139,292,9,499,307
+Anti-Gay (Male),867,289,265,4,4,2,39,91,92,185,6,289,173
+Anti-Lesbian,142,60,36,0,2,0,2,13,19,24,0,60,29
+"Anti-Lesbian, Gay, Bisexual, or Transgender (Mixed Group)",342,141,65,2,1,1,9,33,26,80,3,126,90
+Anti-Heterosexual,17,4,6,0,0,0,0,0,1,0,0,9,7
+Anti-Bisexual,27,8,7,0,0,0,1,3,1,3,0,15,8
+Disability:,169,71,33,0,0,0,4,13,12,28,2,75,48
+Anti-Physical,53,20,6,0,0,0,1,3,6,10,1,12,23
+Anti-Mental,116,51,27,0,0,0,3,10,6,18,1,63,25
+Gender:,80,38,23,1,0,0,1,6,9,18,0,41,11
+Anti-Male,18,9,6,0,0,0,0,1,2,7,0,7,2
+Anti-Female,62,29,17,1,0,0,1,5,7,11,0,34,9
+Gender Identity:,224,73,71,1,0,0,6,32,32,45,2,82,41
+Anti-Transgender,173,52,60,1,0,0,5,28,26,33,2,63,27
+Anti-Gender Non-Conforming,51,21,11,0,0,0,1,4,6,12,0,19,14
+Multiple-Bias Incidents2,257,108,19,1,0,0,6,4,8,56,2,72,119

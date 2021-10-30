@@ -38,29 +38,53 @@
     <link rel="stylesheet" href="libs/bootstrap.css" />
   </head>
   <body>
-    <div class="container bg-">
+    <div class="container">
       <div class="row">
         <div id="lineChart"></div>
       </div>
       <div class="row justify-content-center" style="margin-top: 10px;">
         <div class="col-1"></div>
         <div class="col-md-auto">
-          <button type="button" class="btn btn-secondary btn-sm">
+          <button
+            type="button"
+            onclick="changeViewNewData('victims')"
+            class="btn btn-danger btn-sm"
+            data-bs-toggle="button"
+            aria-pressed="false"
+          >
             Victims
           </button>
         </div>
         <div class="col-md-auto">
-          <button type="button" class="btn btn-secondary btn-sm">
+          <button
+            type="button"
+            onclick="changeViewNewData('offenders')"
+            class="btn btn-danger btn-sm"
+            data-bs-toggle="button"
+            aria-pressed="false"
+          >
             Offenders
           </button>
         </div>
         <div class="col-md-auto">
-          <button type="button" class="btn btn-secondary btn-sm">
+          <button
+            type="button"
+            onclick="changeViewNewData('offenses')"
+            class="btn btn-danger btn-sm"
+            data-bs-toggle="button"
+            aria-pressed="true"
+          >
             Offenses
           </button>
         </div>
         <div class="col-md-auto">
-          <button type="button" class="btn btn-secondary btn-sm">
+          <button
+            type="button"
+            onclick="changeViewNewData('incidents')"
+            class="btn btn-danger btn-sm"
+            data-bs-toggle="button"
+            aria-pressed="false"
+          >
             Incidents
           </button>
         </div>
