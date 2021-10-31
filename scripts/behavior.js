@@ -9,17 +9,28 @@ var map = "data/countries-110m.json";
 
 var topology;
 
+xDefault = d3
+    .scaleBand()
+    .domain([
+      "Race",
+      "Religion",
+      "Sexual Orientation",
+      "Ethnicity/National Origin",
+      "Disability",
+    ]);
+
 Promise.all([d3.json(map), d3.csv(table_1_offenses_src)]).then(function ([
   map,
   table_1_offenses,
 ]) {
   topology = map;
-  console.log(table_1_offenses);
-  console.log(map);
+  //console.log(table_1_offenses);
+  //console.log(map);
   //trableReformatYearsSingleBias(table_11_offenses[1]);
   createLineChart(table_1_offenses, false);
   changeViewNewData("offenses");
   handleLineChartClick(null, "2019");
+  createBarChart(table_1_offenses, false, 2019, defaultDataFilter, xDefault, 600);
 });
 
 /*************    CREATE LINE CHART   *************/
@@ -27,14 +38,14 @@ Promise.all([d3.json(map), d3.csv(table_1_offenses_src)]).then(function ([
 /*This function converts a line from table with format |2005,..2019, singleBias|
 to |singleBias, years|*/
 function trableReformatYearsSingleBias(data) {
-  console.log(data);
+  //console.log(data);
   out = [];
   for (const [key, value] of Object.entries(data)) {
     if (key != "Bias motivation") {
       out.push({ year: key, total: value });
     }
   }
-  console.log(out);
+  //console.log(out);
   return out;
 }
 
@@ -47,6 +58,7 @@ function changeViewNewData(button) {
         unselectAllButtons();
         selectButton(button);
         createLineChart(table_1_victims, true);
+        createBarChart(table_1_victims, true, 2019, defaultDataFilter, xDefault, 600);
       });
       break;
     case "offenders":
@@ -56,6 +68,7 @@ function changeViewNewData(button) {
         unselectAllButtons();
         selectButton(button);
         createLineChart(table_1_offenders, true);
+        createBarChart(table_1_offenders, true, 2019, defaultDataFilter, xDefault, 600);
       });
       break;
 
@@ -66,6 +79,7 @@ function changeViewNewData(button) {
         unselectAllButtons();
         selectButton(button);
         createLineChart(table_1_offenses, true);
+        createBarChart(table_1_offenses, true, 2019, defaultDataFilter, xDefault, 600);
       });
       break;
     case "incidents":
@@ -75,8 +89,11 @@ function changeViewNewData(button) {
         unselectAllButtons();
         selectButton(button);
         createLineChart(table_1_incidents, true);
+        createBarChart(table_1_incidents, true, 2019, defaultDataFilter, xDefault, 600);
       });
       break;
+    default:
+        break;
   }
 }
 
@@ -97,13 +114,13 @@ function createLineChart(table_11, update) {
   const height = 150;
   margin = { top: 10, right: 15, bottom: 20, left: 35 };
 
-  console.log(table_11[1]);
+  // console.log(table_11[1]);
   data = trableReformatYearsSingleBias(table_11[1]);
 
   line = d3
     .line()
     .defined(function (d) {
-      console.log(d);
+      //   console.log(d);
       return d.year;
     })
     .x((d) => x(d.year))
@@ -184,7 +201,7 @@ function createLineChart(table_11, update) {
     .select("g.line")
     .selectAll("circle")
     .data(data, function (d) {
-      console.log(d);
+      //console.log(d);
       return d.year;
     })
     .join(
@@ -218,8 +235,8 @@ function createLineChart(table_11, update) {
 var selectedYears = [];
 
 function handleLineChartClick(event, d) {
-  console.log(selectedYears.length);
-  console.log(typeof selectedYears.length);
+  //console.log(selectedYears.length);
+  //console.log(typeof selectedYears.length);
 
   // Primeiro vou filtrar todas as selections
   if (selectedYears.length != 0) {
@@ -249,7 +266,7 @@ function handleLineChartClick(event, d) {
     lineChart
       .selectAll("circle")
       .filter(function (c) {
-        console.log(c);
+        //console.log(c);
         if (clickedYear == c.year || clickedYear == c) {
           return c;
         }
@@ -260,7 +277,7 @@ function handleLineChartClick(event, d) {
     lineChartXaxis
       .selectAll("text")
       .filter(function (c) {
-        console.log(c);
+        //console.log(c);
         if (clickedYear == c.year || clickedYear == c) {
           return c;
         }
@@ -296,256 +313,314 @@ function clearLineChartSelections(year) {
 }
 
 /***********************************************************************************/
-function createBarChart(data) {
-  const width = 600;
-  const height = 1100;
 
-  margin = { top: 30, right: 30, bottom: 10, left: 30 };
+/*function tableGetX(data) {
+    //console.log(data);
+    var out;
+    for (const [key, value] of Object.entries(data)) {
+        if (key == "Bias motivation" && value == 'Race:') {
+            out = value;
+        }
+        if (key == "Bias motivation" && value == 'Religion:') {
+            out = value;
+        }
+        if (key == "Bias motivation" && value == 'Sexual Orientation:') {
+            out = value;
+        }
+        if (key == "Bias motivation" && value == 'Ethnicity/National Origin:') {
+            out = value;
+        }
+        if (key == "Bias motivation" && value == 'Disability:') {
+            out = value;
+        }
+      if (key != "Bias motivation") {
+        out.push({ year: key, total: value });
+      }
+    }
+    //console.log(out);
+    return out.replace(":", "");
+}*/
 
-  x = d3
-    .scaleLinear()
-    .domain([0, 10])
-    .range([margin.left, width - margin.right]);
+function tableGetInfo(data, year) {
+  //console.log(data);
+  var out = [];
+  var out_value;
+  var bias_type;
+  for (const [key, value] of Object.entries(data)) {
+    //console.log(value);
+    //for (const [kkey, vvalue] of Object.entries(value)) {
+    //  console.log(kkey);
+    //    console.log(vvalue);
+    //}~
+    out_value = -1;
+    for (const [kkey, vvalue] of Object.entries(value)) {
+      if (kkey == year) {
+        out_value = vvalue;
+      }
+      bias_type = vvalue;
+    }
+    out.push({ line: bias_type, value: out_value });
+    //break;
+  }
+  //console.log(out);
+  return out;
+}
+
+
+
+function createBarChart(data, update, year, func, x, width) {
+  height = 350;
+
+  margin = { top: 20, right: 20, bottom: 20, left: 40 };
+
+
+  x.range([margin.left, width - margin.right]);
+  //console.log(data);
+  /* x_values = []
+    x_values.push(tableGetX(data[2]));
+    x_values.push(tableGetX(data[8]));
+    x_values.push(tableGetX(data[16]));
+    x_values.push(tableGetX(data[22]));
+    x_values.push(tableGetX(data[25]));*/
+  //console.log(x_values);
+
+
+  var color = d3.scaleOrdinal().range(["#6b486b", "#a05d56", "#d0743c", "#ff8c00", "steelblue"]);
 
   y = d3
-    .scaleBand()
-    .domain(d3.range(data.length))
-    .range([margin.top, height - margin.bottom])
-    .padding(0.2);
-
-  var color = d3
     .scaleLinear()
-    .domain([0, d3.max(data, (d) => d.budget)])
-    .range(["lightblue", "steelblue"]);
+    .domain([0, 5000])
+    .range([height - margin.bottom, margin.top]);
+  //.padding(0.5);
 
-  //function that creates the x axis
-  // no video o caralhinho nao explicou oque raio faz a ultima linha mas pronto jesus ha de me ajudar
   function xAxis(g) {
-    g.attr("transform", `translate(0, ${margin.top})`)
-      .call(d3.axisTop(x).ticks(10))
-      .call((g) => g.select(".domain").remove());
+    g.attr("transform", `translate(0, ${height - margin.bottom})`).call(
+      d3.axisBottom(x)
+    );
   }
 
   function yAxis(g) {
     g.attr("transform", `translate(${margin.left}, 0)`).call(
       d3
         .axisLeft(y)
-        .tickFormat((i) => data[i].year)
+        //.tickFormat((i) => {
+        //  if (data[i].oscar_year % 3 == 0) return data[i].oscar_year;
+        //})
         .tickSizeOuter(0)
     );
+  }
+
+  if (!update) {
+    d3.select("div#barChart")
+      .append("svg")
+      .append("g")
+      .attr("class", "bars")
+      .attr("fill", "steelblue");
   }
 
   const svg = d3
     .select("div#barChart")
-    .append("svg")
-    .attr("width", width)
-    .attr("height", height);
-
-  // NEXT GIANT LINE OF CODE CREATES THE BARS
-  // g element is a grouping element
-  // .selectAll will be empty
-  // the function will gather the names of the data set and bound them to
-  // the id of each bar element class.
-  // everything that comes after the join is applied to each bar.
-  //
-  svg
-    .append("g")
-    .attr("class", "bars")
-    //.style("fill", "steelblue")
-    .selectAll("rect")
-    .data(data, function (d) {
-      return d.name;
-    })
-    .join("rect")
-    .attr("x", x(0))
-    .attr("y", function (d, i) {
-      //this log is only to show that every
-      //data element will go through this function
-      console.log(d);
-      return y(i);
-    })
-    .attr("width", (d) => x(d.rating) - x(0))
-    .attr("height", y.bandwidth())
-    .attr("fill", function (d) {
-      return color(d.budget);
-    })
-    .append("svg:title")
-    .text(function (d) {
-      return d.title;
-    });
-
-  // NEXT GIANT LINE OF CODE CREATES THE TEXT INSIDE THE BAR
-  // svg
-  //   .append("g")
-  //   .attr("class", "values")
-  //   .style("fill", "white")
-  //   .attr("text-anchor", "end")
-  //   .attr("font-size", 10)
-  //   .selectAll("text")
-  //   .data(data, function (d) {
-  //     return d.name;
-  //   })
-  //   .join("rect")
-  //   .attr("x", (d) => x(d.rating))
-  //   .attr("y", function (d, i) {
-  //     //this log is only to show that every
-  //     //data element will go through this function
-  //     console.log(d);
-  //     return y(i) + y.bandwidth() / 2;
-  //   })
-  //   .attr("dy", 4)
-  //   .attr("dx", -4)
-  //   .text((d) => d.title);
-
-  svg.append("g").attr("class", "xAxis").call(xAxis);
-  svg.append("g").attr("class", "yAxis").call(yAxis);
-}
-
-function updateBarChart(data) {
-  const width = 600;
-  const height = 900;
-
-  margin = { top: 30, right: 30, bottom: 10, left: 30 };
-
-  x = d3
-    .scaleLinear()
-    .domain([0, 10])
-    .range([margin.left, width - margin.right]);
-
-  y = d3
-    .scaleBand()
-    .domain(d3.range(data.length))
-    .range([margin.top, height - margin.bottom])
-    .padding(0.3);
-
-  //function that creates the x axis
-  // no video o caralhinho nao explicou oque raio faz a ultima linha mas pronto jesus ha de me ajudar
-  function xAxis(g) {
-    g.attr("transform", `translate(0, ${margin.top})`)
-      .call(d3.axisTop(x).ticks(10))
-      .call((g) => g.select(".domain").remove());
-  }
-
-  function yAxis(g) {
-    g.attr("transform", `translate(${margin.left}, 0)`).call(
-      d3
-        .axisLeft(y)
-        .tickFormat((i) => data[i].year)
-        .tickSizeOuter(0)
-    );
-  }
-
-  const svg = d3
-    .select("body")
     .select("svg")
     .attr("width", width)
     .attr("height", height);
 
-  // NEXT GIANT LINE OF CODE CREATES THE BARS
-  // g element is a grouping element
-  // .selectAll will be empty
-  // the function will gather the names of the data set and bound them to
-  // the id of each bar element class.
-  // everything that comes after the join is applied to each bar.
-  //
+  var dict_lines = tableGetInfo(data, year);
+  //console.log(dict_lines);
+
+  new_data = dict_lines.filter(function(d) {
+      return func(d);
+  });
+  // bars
   svg
     .select("g.bars")
     .selectAll("rect")
-    .data(data, function (d) {
-      return d.name;
+    .data(new_data, function (d) {
+      return d.value;
     })
     .join(
       (enter) => {
         return enter
           .append("rect")
-          .attr("x", x(0))
-          .attr("y", function (d, i) {
-            //this log is only to show that every
-            //data element will go through this function
+          .attr("x", function (d) {
             //console.log(d);
-            return y(i);
+            return x(d.line.replace(":", ""));
           })
-          .attr("width", (d) => x(d.rating) - x(0))
-          .attr("height", y.bandwidth());
+          .attr("y", (d) => y(d.value))
+          .attr("width", x.bandwidth() - 5)
+          .attr("height", (d) => height - margin.bottom - y(d.value))
+          .style("fill", function(d, i) {
+            return color(i);
+          })
+        //.on("mouseover", handleMouseHover)
+        //.on("mouseleave", handleMouseLeave)
+        .on("click", function(d, i) {
+            //console.log(d);
+            //console.log(i); //i é o d antigo
+           // console.log(d3.event);
+           //console.log("vivo");
+           handleBarClick(i, data);
+        });
       },
       (update) => {
         update
-          .attr("x", x(0))
-          .attr("y", function (d, i) {
-            //this log is only to show that every
-            //data element will go through this function
-            console.log(d);
-            return y(i);
-          })
-          .attr("width", (d) => x(d.rating) - x(0))
-          .attr("height", y.bandwidth());
+        .attr("x", function (d) {
+            //console.log(d);
+            return x(d.line.replace(":", ""));
+        })
+        .attr("y", (d) => y(d.value))
+        .attr("width", x.bandwidth() - 5)
+        .attr("height", (d) => height - margin.bottom - y(d.value))
+        .style("background-color", function(d, i) {
+        return color(i);
+        });
       },
       (exit) => {
         exit.remove();
       }
     );
 
-  svg
-    .select("g.values")
-    .selectAll("text")
-    .data(data, function (d) {
-      return d.name;
-    })
-    .join(
-      (enter) => {
-        return enter
-          .append("text")
-          .attr("x", (d) => x(d.rating))
-          .attr("y", function (d, i) {
-            //this log is only to show that every
-            //data element will go through this function
-            //console.log(d);
-            return y(i) + y.bandwidth() / 2;
-          })
-          .attr("dy", 4)
-          .attr("dx", -4)
-          .text((d) => d.title);
-      },
-      (update) => {
-        update
-          .attr("x", (d) => x(d.rating))
-          .attr("y", function (d, i) {
-            //this log is only to show that every
-            //data element will go through this function
-            //console.log(d);
-            return y(i) + y.bandwidth() / 2;
-          })
-          .attr("dy", 4)
-          .attr("dx", -4)
-          .text((d) => d.title);
-      },
-      (exit) => {
-        exit.remove();
-      }
-    );
-
-  svg
-    .append("g")
-    .attr("class", "values")
-    .style("fill", "white")
-    .attr("text-anchor", "end")
-    .attr("font-size", 15)
-    .selectAll("text")
-    .data(data, function (d) {
-      return d.name;
-    })
-    .join("rect")
-    .attr("x", (d) => x(d.rating))
-    .attr("y", function (d, i) {
-      //this log is only to show that every
-      //data element will go through this function
-      console.log(d);
-      return y(i) + y.bandwidth() / 2;
-    })
-    .attr("dy", 4)
-    .attr("dx", -4)
-    .text((d) => d.rating);
+  if (!update) {
+    svg.append("g").attr("class", "xAxis");
+    svg.append("g").attr("class", "yAxis");
+  }
 
   svg.select("g.xAxis").call(xAxis);
+
   svg.select("g.yAxis").call(yAxis);
+}
+
+function handleBarClick(d, dataset) {
+    //console.log(d);
+    //console.log(dataset);
+
+    switch(d.line) {
+        case "Race:":
+            // Show barchart related to race crimes
+            xRace = d3
+                .scaleBand()
+                .domain([
+                    "Anti-White",
+                    "Anti-Black",
+                    "Anti-American Indian/Alaskan Native",
+                    "Anti-Asian/Pacific Islander",
+                    "Anti-Multiple Races, Group"
+                ]);
+            createBarChart(dataset, true, 2019, raceDataFilter, xRace, 800);
+            break;
+        case "Religion:":
+            // Show barchart related to religion crimes
+            xReligion = d3
+                .scaleBand()
+                .domain([
+                    "Anti-Jewish",
+                    "Anti-Catholic",
+                    "Anti-Protestant",
+                    "Anti-Islamic",
+                    "Anti-Other Religion", 
+                    "Anti-Multiple Religions, Group",
+                    "Anti-Atheism/Agnosticism/etc."
+                ]);
+                createBarChart(dataset, true, 2019, religionDataFilter, xReligion, 900);
+            break;
+        case "Sexual Orientation:":
+            xSexual = d3
+                .scaleBand()
+                .domain([
+                    "Anti-Male Homosexual",
+                    "Anti-Female Homosexual",
+                    "Anti-Homosexual",
+                    "Anti-Heterosexual",
+                    "Anti-Bisexual"
+                ]);
+                createBarChart(dataset, true, 2019, sexualDataFilter, xSexual, 600);
+            break;
+        case "Ethnicity/National Origin:":
+            xE = d3
+                .scaleBand()
+                .domain([
+                    "Anti-Hispanic",
+                    "Anti-Other Ethnicity/National Origin"
+                ]);
+                createBarChart(dataset, true, 2019, ethnicityDataFilter, xE, 300);
+            break;
+        case "Disability:":
+            xDisability = d3
+                .scaleBand()
+                .domain([
+                    "Anti-Physical",
+                    "Anti-Mental"
+                ]);
+                createBarChart(dataset, true, 2019, disabilityDataFilter, xDisability, 300);
+            break;
+        default:
+            break;
+    }
+}
+
+function defaultDataFilter(d) {
+    if (
+        d.line == "Race:" ||
+        d.line == "Religion:" ||
+        d.line == "Sexual Orientation:" ||
+        d.line == "Ethnicity/National Origin:" ||
+        d.line == "Disability:"
+      ) {
+        return d;
+      }
+}
+
+function raceDataFilter(d) {
+    if (
+        d.line == "Anti-White" ||
+        d.line == "Anti-Black" ||
+        d.line == "Anti-American Indian/Alaskan Native" ||
+        d.line == "Anti-Asian/Pacific Islander" ||
+        d.line == "Anti-Multiple Races, Group"
+    ) {
+        return d;
+    }
+}
+
+function religionDataFilter(d) {
+    if (
+        d.line == "Anti-Jewish" ||
+        d.line == "Anti-Catholic" ||
+        d.line == "Anti-Protestant" ||
+        d.line == "Anti-Islamic" ||
+        d.line == "Anti-Other Religion" ||
+        d.line == "Anti-Multiple Religions, Group" ||
+        d.line == "Anti-Atheism/Agnosticism/etc."
+    ) {
+        return d;
+    }
+}
+
+function sexualDataFilter(d) {
+    if (
+        d.line == "Anti-Male Homosexual" ||
+        d.line == "Anti-Female Homosexual" ||
+        d.line == "Anti-Homosexual" ||
+        d.line == "Anti-Heterosexual" ||
+        d.line == "Anti-Bisexual"
+    ) {
+        return d;
+    }
+}
+
+function ethnicityDataFilter(d) {
+    if (
+        d.line == "Anti-Hispanic" ||
+        d.line == "Anti-Other Ethnicity/National Origin" 
+    ) {
+        return d;
+    }
+}
+
+function disabilityDataFilter(d) {
+    if (
+        d.line == "Anti-Physical" ||
+        d.line == "Anti-Mental"
+    ) {
+        return d;
+    }
 }
