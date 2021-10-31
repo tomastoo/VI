@@ -7,6 +7,7 @@ var table_11_incidents_src = "data/table11-Incidents.csv";
 var table_11_offenses_src = "data/table11-Offenses.csv";
 var map = "data/countries-110m.json";
 
+var tooltip;
 var topology;
 var currentFilter;
 
@@ -373,6 +374,10 @@ function createBarChart(data, update, year, func, x, width) {
 
   var color = d3.scaleOrdinal().range(["#6b486b", "#a05d56", "#d0743c", "#ff8c00", "steelblue"]);
 
+  tooltip = d3.select("body").append("div")
+	.attr("class", "tooltip")
+	.style("opacity", 0);
+
   y = d3
     .scaleLinear()
     .domain([0, 5000])
@@ -429,24 +434,20 @@ function createBarChart(data, update, year, func, x, width) {
           .append("rect")
           .attr("x", function (d,i) {
             //console.log(d);
-            console.log(i);
-            console.log(x(i));
+           // console.log(i);
+            //console.log(x(i));
             return (x(d.line.replace(":", "")))
             //return x(i);
           })
           .attr("y", (d) => y(d.value))
-          .attr("width", x.bandwidth() - 5)
+          .attr("width", x.bandwidth() - 10)
           .attr("height", (d) => height - margin.bottom - y(d.value))
           .style("fill", function(d, i) {
             return color(i);
           })
-        //.on("mouseover", handleMouseHover)
-        //.on("mouseleave", handleMouseLeave)
-        .on("click", function(d, i) {
-            //console.log(d);
-            //console.log(i); //i é o d antigo
-           // console.log(d3.event);
-           //console.log("vivo");
+        .on("mouseover", handleMouseHover)
+        .on("mouseleave", handleMouseLeave)
+        .on("click", function(d, i) {;
            handleBarClick(i, data);
         });
       },
@@ -457,11 +458,13 @@ function createBarChart(data, update, year, func, x, width) {
             return x(d.line.replace(":", ""));
         })
         .attr("y", (d) => y(d.value))
-        .attr("width", x.bandwidth() - 5)
+        .attr("width", x.bandwidth() - 10)
         .attr("height", (d) => height - margin.bottom - y(d.value))
         .style("background-color", function(d, i) {
         return color(i);
-        });
+        })
+        .on("mouseover", handleMouseHover)
+        .on("mouseleave", handleMouseLeave);
       },
       (exit) => {
         exit.remove();
@@ -481,6 +484,11 @@ function createBarChart(data, update, year, func, x, width) {
 function handleBarClick(d, dataset) {
     //console.log(d);
     //console.log(dataset);
+
+    tooltip.transition()
+            .duration(400)
+			.style("opacity", 0)
+
 
     switch(d.line) {
         case "Race:":
@@ -661,4 +669,20 @@ function moveBackChart() {
 
     let element = document.getElementById("magicButton");
     element.setAttribute("hidden", "hidden");
+}
+
+function handleMouseHover(event, d) {
+    tooltip.transition()
+            .duration(400)
+			.style("opacity", 1)
+        
+    tooltip.html("Total: " + d.value)	
+    .style("left", (event.pageX) + "px")		
+    .style("top", (event.pageY) + "px")
+}
+
+function handleMouseLeave(event, d) {
+    tooltip.transition()
+            .duration(400)
+			.style("opacity", 0)
 }
