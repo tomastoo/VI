@@ -13,3 +13,11 @@ div.tooltip {
   border: 0px;		
   border-radius: 8px;			
 }
+
+#magicButton {
+  position: absolute;
+  left: 550px;
+  top: 220px;
+}
+
+

@@ -17,8 +17,21 @@ xDefault = d3
     "Race",
     "Religion",
     "Sexual Orientation",
-    "Ethnicity/National Origin",
     "Disability",
+    "Gender",
+    "Gender identity"
+  ])
+  .range([0, 100]);
+
+xDefaultprev = d3
+  .scaleBand()
+  .domain([
+    "Race",
+    "Religion",
+    "Sexual Orientation",
+    "Disability",
+    "Gender",
+    "Gender identity"
   ])
   .range([0, 100]);
 
@@ -61,7 +74,7 @@ function trableReformatYearsSingleBias(data) {
   // for (var i = 0; i < out.length; i++) {
   //   out[i]["norm"] = out[i].total / max;
   // }
-  console.log(out);
+  //console.log(out);
   return out;
 }
 
@@ -425,14 +438,6 @@ function createBarChart(data, update, year, func, x, width) {
   margin = { top: 20, right: 30, bottom: 20, left: 35 };
 
   x.range([margin.left, width - margin.right]);
-  //console.log(data);
-  /* x_values = []
-    x_values.push(tableGetX(data[2]));
-    x_values.push(tableGetX(data[8]));
-    x_values.push(tableGetX(data[16]));
-    x_values.push(tableGetX(data[22]));
-    x_values.push(tableGetX(data[25]));*/
-  //console.log(x_values);
 
   var color = d3
     .scaleOrdinal()
@@ -485,11 +490,14 @@ function createBarChart(data, update, year, func, x, width) {
   //console.log(dict_lines);
 
   new_data = dict_lines.filter(function (d) {
-    return func(d);
+    return func(d, year);
   });
   // bars
-  console.log(x.bandwidth());
-  var max = d3.max(new_data, (d) => d.value);
+  var max = getMax(new_data);
+  var min = getMin(new_data);
+
+  var range = max - min;
+
   svg
     .select("g.bars")
     .selectAll("rect")
@@ -501,15 +509,11 @@ function createBarChart(data, update, year, func, x, width) {
         return enter
           .append("rect")
           .attr("x", function (d, i) {
-            //console.log(d);
-            // console.log(i);
-            //console.log(x(i));
             return x(d.line.replace(":", ""));
-            //return x(i);
           })
-          .attr("y", (d) => y(d.value / max))
+          .attr("y", (d) => y((d.value-min) / range))
           .attr("width", x.bandwidth() - 30)
-          .attr("height", (d) => height - margin.bottom - y(d.value / max))
+          .attr("height", (d) => height - margin.bottom - y((d.value-min) / range))
           .style("fill", function (d, i) {
             return color(i);
           })
@@ -525,9 +529,9 @@ function createBarChart(data, update, year, func, x, width) {
             //console.log(d);
             return x(d.line.replace(":", ""));
           })
-          .attr("y", (d) => y(d.value / max))
+          .attr("y", (d) => y( (d.value-min) / range) )
           .attr("width", x.bandwidth() - 30)
-          .attr("height", (d) => height - margin.bottom - y(d.value / max))
+          .attr("height", (d) => height - margin.bottom - y((d.value-min) / range))
           .style("background-color", function (d, i) {
             return color(i);
           })
@@ -599,11 +603,6 @@ function handleBarClick(d, dataset) {
       createBarChart(dataset, true, 2019, sexualDataFilter, xSexual, 600);
       showBackButton();
       break;
-    case "Ethnicity/National Origin:":
-      xE = d3.scaleBand().domain(["Anti-Hispanic", "Anti-Other Ethnicity"]);
-      createBarChart(dataset, true, 2019, ethnicityDataFilter, xE, 300);
-      showBackButton();
-      break;
     case "Disability:":
       xDisability = d3.scaleBand().domain(["Anti-Physical", "Anti-Mental"]);
       createBarChart(
@@ -616,24 +615,56 @@ function handleBarClick(d, dataset) {
       );
       showBackButton();
       break;
+    case "Gender:":
+        xGender = d3
+            .scaleBand()
+            .domain([
+                "Anti-male",
+                "Anti-female"
+            ]);
+            createBarChart(dataset, true, 2019, genderDataFilter, xGender, 300);
+    case "Gender:":
+        xGenderI = d3
+            .scaleBand()
+            .domain([
+                "Anti-Transgender",
+                "Anti-Gender Non-Conforming"
+            ]);
+        createBarChart(dataset, true, 2019, genderDataIdentityFilter, xGenderI, 300);
+        break;
     default:
       break;
   }
 }
 
-function defaultDataFilter(d) {
-  if (
-    d.line == "Race:" ||
-    d.line == "Religion:" ||
-    d.line == "Sexual Orientation:" ||
-    d.line == "Ethnicity/National Origin:" ||
-    d.line == "Disability:"
-  ) {
-    return d;
+function defaultDataFilter(d, year) {
+
+  if (year >= 2013) {
+    if (
+        d.line == "Race:" ||
+        d.line == "Religion:" ||
+        d.line == "Sexual Orientation:" ||
+        d.line == "Disability:" ||
+        d.line == "Gender:" ||
+        d.line == "Gender Identity:"
+      ) {
+        return d;
+      }
   }
+  else {
+    if (
+        d.line == "Race:" ||
+        d.line == "Religion:" ||
+        d.line == "Sexual Orientation:" ||
+        d.line == "Disability:"
+      ) {
+        return d;
+      }
+  }
+  
 }
 
-function raceDataFilter(d) {
+function raceDataFilter(d, year) {
   if (
     d.line == "Anti-White" ||
     d.line == "Anti-Black" ||
@@ -645,7 +676,7 @@ function raceDataFilter(d) {
   }
 }
 
-function religionDataFilter(d) {
+function religionDataFilter(d, year) {
   if (
     d.line == "Anti-Jewish" ||
     d.line == "Anti-Catholic" ||
@@ -659,7 +690,7 @@ function religionDataFilter(d) {
   }
 }
 
-function sexualDataFilter(d) {
+function sexualDataFilter(d, year) {
   if (
     d.line == "Anti-Male Homosexual" ||
     d.line == "Anti-Female Homosexual" ||
@@ -671,16 +702,23 @@ function sexualDataFilter(d) {
   }
 }
 
-function ethnicityDataFilter(d) {
-  if (d.line == "Anti-Hispanic" || d.line == "Anti-Other Ethnicity") {
+
+function disabilityDataFilter(d, year) {
+  if (d.line == "Anti-Physical" || d.line == "Anti-Mental") {
     return d;
   }
 }
 
-function disabilityDataFilter(d) {
-  if (d.line == "Anti-Physical" || d.line == "Anti-Mental") {
-    return d;
-  }
+function genderDataFilter(d, year) {
+    if (d.line == "Anti-Male" || d.line == "Anti-Female") {
+        return d;
+      }
+}
+
+function genderDataIdentityFilter(d, year) {
+    if (d.line == "Anti-Transgender" || d.line == "Anti-Gender Non-Conforming") {
+        return d;
+      }
 }
 
 function showBackButton() {
@@ -755,6 +793,7 @@ function moveBackChart() {
 }
 
 function handleMouseHover(event, d) {
+
   tooltip.transition().duration(400).style("opacity", 1);
 
   tooltip
@@ -765,4 +804,24 @@ function handleMouseHover(event, d) {
 
 function handleMouseLeave(event, d) {
   tooltip.transition().duration(400).style("opacity", 0);
+}
+
+function getMax(data) {
+    max = 0;
+    for (const [key, value] of Object.entries(data)) {
+        if (parseInt(value.value) > max) {
+            max = parseInt(value.value);
+        }
+      }
+      return max;
+}
+
+function getMin(data) {
+    min = 100000;
+    for (const [key, value] of Object.entries(data)) {
+        if (parseInt(value.value) < min) {
+            min = parseInt(value.value);
+        }
+      }
+      return min;
 }
