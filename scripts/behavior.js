@@ -590,11 +590,12 @@ function createBarChart(data, update, year, func, x, width) {
   console.log(new_data);
   // bars
   var max = getMax(new_data);
-  var min = getMin(new_data);
+  var min = 0;
 
   var range = max - min;
-  console.log("range: " + range);
-  console.log("height: " + (height - margin.bottom - y((d.value-min) / range)))
+  //console.log("range: " + range);
+  //console.log("height: " + (height - margin.bottom - y((d.value-min + 1) / range)))
+  //200 - 20 - y((53-53)/63)
 
   svg
     .select("g.bars")
@@ -649,6 +650,11 @@ function createBarChart(data, update, year, func, x, width) {
   svg.select("g.xAxis").call(xAxis);
 
   svg.select("g.yAxis").call(yAxis);
+
+  d3.select("div#barChart").select("g.XAxis").selectAll(".tick").on("click", function (d, i) {
+      console.log(i);
+      handleBarClick(i, data);});
+  //d3.select(".lineXAxis").attr("font-size", 13);
 }
 
 function handleBarClick(d, dataset) {
