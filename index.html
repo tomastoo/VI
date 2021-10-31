@@ -42,35 +42,42 @@
       <div class="row">
         <div id="lineChart"></div>
       </div>
-      <div class="row justify-content-center" style="margin-top: 10px;">
+      <div
+        id="mainButtons"
+        class="row justify-content-center"
+        style="margin-top: 10px;"
+      >
         <div class="col-1"></div>
         <div class="col-md-auto">
           <button
+            id="victims"
             type="button"
             onclick="changeViewNewData('victims')"
-            class="btn btn-danger btn-sm"
+            class="btn btn-secondary btn-sm"
             data-bs-toggle="button"
-            aria-pressed="false"
+            aria-pressed="true"
           >
             Victims
           </button>
         </div>
         <div class="col-md-auto">
           <button
+            id="offenders"
             type="button"
             onclick="changeViewNewData('offenders')"
-            class="btn btn-danger btn-sm"
+            class="btn btn-secondary btn-sm"
             data-bs-toggle="button"
-            aria-pressed="false"
+            aria-pressed="true"
           >
             Offenders
           </button>
         </div>
         <div class="col-md-auto">
           <button
+            id="offenses"
             type="button"
             onclick="changeViewNewData('offenses')"
-            class="btn btn-danger btn-sm"
+            class="btn btn-secondary btn-sm"
             data-bs-toggle="button"
             aria-pressed="true"
           >
@@ -79,20 +86,17 @@
         </div>
         <div class="col-md-auto">
           <button
+            id="incidents"
             type="button"
             onclick="changeViewNewData('incidents')"
-            class="btn btn-danger btn-sm"
+            class="btn btn-secondary btn-sm"
             data-bs-toggle="button"
-            aria-pressed="false"
+            aria-pressed="true"
           >
             Incidents
           </button>
         </div>
       </div>
     </div>
-
-    <!-- <div id="barChart"></div>
-    <div id="scatterPlot"></div> -->
-    <div id="MainButtons"></div>
   </body>
 </html>

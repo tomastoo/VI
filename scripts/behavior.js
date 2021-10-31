@@ -18,6 +18,7 @@ Promise.all([d3.json(map), d3.csv(table_1_offenses_src)]).then(function ([
   console.log(map);
   //trableReformatYearsSingleBias(table_11_offenses[1]);
   createLineChart(table_1_offenses, false);
+  changeViewNewData("offenses");
   handleLineChartClick(null, "2019");
 });
 
@@ -43,6 +44,8 @@ function changeViewNewData(button) {
       Promise.all([d3.csv(table_1_victims_src)]).then(function ([
         table_1_victims,
       ]) {
+        unselectAllButtons();
+        selectButton(button);
         createLineChart(table_1_victims, true);
       });
       break;
@@ -50,6 +53,8 @@ function changeViewNewData(button) {
       Promise.all([d3.csv(table_1_offenders_src)]).then(function ([
         table_1_offenders,
       ]) {
+        unselectAllButtons();
+        selectButton(button);
         createLineChart(table_1_offenders, true);
       });
       break;
@@ -58,6 +63,8 @@ function changeViewNewData(button) {
       Promise.all([d3.csv(table_1_offenses_src)]).then(function ([
         table_1_offenses,
       ]) {
+        unselectAllButtons();
+        selectButton(button);
         createLineChart(table_1_offenses, true);
       });
       break;
@@ -65,10 +72,24 @@ function changeViewNewData(button) {
       Promise.all([d3.csv(table_1_incidents_src)]).then(function ([
         table_1_incidents,
       ]) {
+        unselectAllButtons();
+        selectButton(button);
         createLineChart(table_1_incidents, true);
       });
       break;
   }
+}
+
+function selectButton(button) {
+  var select = "button#" + button;
+  var buttonEl = d3.select(select).attr("class", "btn btn-danger btn-sm");
+}
+
+function unselectAllButtons() {
+  var buttonEl = d3
+    .select("div#mainButtons")
+    .selectAll("button")
+    .attr("class", "btn btn-secondary btn-sm");
 }
 
 function createLineChart(table_11, update) {
@@ -192,15 +213,6 @@ function createLineChart(table_11, update) {
         exit.remove();
       }
     );
-}
-
-function clickMe(event, d) {
-  lineChart = d3.select(".lineXAxis");
-
-  selectAll(".tick");
-
-  console.log(d);
-  alert(d);
 }
 
 var selectedYears = [];
