@@ -3,6 +3,11 @@ var table_1_offenses_src = "data/table1-Offenses.csv";
 var table_1_victims_src = "data/table1-Victims.csv";
 var table_1_offenders_src = "data/table1-Known Offender.csv";
 
+var table_1_incidents;
+var table_1_offenses;
+var table_1_victims;
+var table_1_offenders;
+
 var table_11_incidents_src = "data/table11-Incidents.csv";
 var table_11_offenses_src = "data/table11-Offenses.csv";
 var map = "data/countries-110m.json";
@@ -10,6 +15,7 @@ var map = "data/countries-110m.json";
 var tooltip;
 var topology;
 var currentFilter;
+var lastClickedYear;
 
 xDefault = d3
   .scaleBand()
@@ -24,24 +30,34 @@ xDefault = d3
 
 Promise.all([d3.json(map), d3.csv(table_1_offenses_src)]).then(function ([
   map,
-  table_1_offenses,
+  table_1_offenses_,
 ]) {
+  console.log(typeof table_1_offenses_);
+  table_1_offenses = table_1_offenses_;
+  // table_1_offenses = Object.assign({}, table_1_offenses_);
+
   topology = map;
   //console.log(table_1_offenses);
   //console.log(map);
   //trableReformatYearsSingleBias(table_11_offenses[1]);
   createLineChart(table_1_offenses, false);
   changeViewNewData("offenses");
-  handleLineChartClick(null, "2019");
+
   createBarChart(
     table_1_offenses,
     false,
-    2019,
+    lastClickedYear,
     defaultDataFilter,
     xDefault,
     600
   );
+  tooltip = d3
+    .select("body")
+    .append("div")
+    .attr("class", "tooltip")
+    .style("opacity", 0);
   currentFilter = "offenses";
+  handleLineChartClick(null, "2019");
 });
 
 /*************    CREATE LINE CHART   *************/
@@ -69,15 +85,16 @@ function changeViewNewData(button) {
   switch (button) {
     case "victims":
       Promise.all([d3.csv(table_1_victims_src)]).then(function ([
-        table_1_victims,
+        table_1_victims_,
       ]) {
+        table_1_victims = table_1_victims_;
         unselectAllButtons();
         selectButton(button);
         createLineChart(table_1_victims, true);
         createBarChart(
           table_1_victims,
           true,
-          2019,
+          lastClickedYear,
           defaultDataFilter,
           xDefault,
           600
@@ -87,15 +104,16 @@ function changeViewNewData(button) {
       break;
     case "offenders":
       Promise.all([d3.csv(table_1_offenders_src)]).then(function ([
-        table_1_offenders,
+        table_1_offenders_,
       ]) {
+        table_1_offenders = table_1_offenders_;
         unselectAllButtons();
         selectButton(button);
         createLineChart(table_1_offenders, true);
         createBarChart(
           table_1_offenders,
           true,
-          2019,
+          lastClickedYear,
           defaultDataFilter,
           xDefault,
           600
@@ -106,15 +124,16 @@ function changeViewNewData(button) {
 
     case "offenses":
       Promise.all([d3.csv(table_1_offenses_src)]).then(function ([
-        table_1_offenses,
+        table_1_offenses_,
       ]) {
+        table_1_offenses = table_1_offenses_;
         unselectAllButtons();
         selectButton(button);
         createLineChart(table_1_offenses, true);
         createBarChart(
           table_1_offenses,
           true,
-          2019,
+          lastClickedYear,
           defaultDataFilter,
           xDefault,
           600
@@ -124,15 +143,16 @@ function changeViewNewData(button) {
       break;
     case "incidents":
       Promise.all([d3.csv(table_1_incidents_src)]).then(function ([
-        table_1_incidents,
+        table_1_incidents_,
       ]) {
+        table_1_incidents = table_1_incidents_;
         unselectAllButtons();
         selectButton(button);
         createLineChart(table_1_incidents, true);
         createBarChart(
           table_1_incidents,
           true,
-          2019,
+          lastClickedYear,
           defaultDataFilter,
           xDefault,
           600
@@ -207,7 +227,7 @@ function createLineChart(table_11, update) {
       .call(
         d3
           .axisLeft(y)
-          .tickFormat((i) => i)
+          .tickFormat((i) => Math.round(i * max))
           .ticks(5)
       )
       .call((g) => g.select(".domain").remove());
@@ -271,6 +291,8 @@ function createLineChart(table_11, update) {
             .attr("cy", (d) => y(d.total / max))
             .attr("r", 5)
             .on("click", handleLineChartClick)
+            .on("mouseover", handleMouseHoverLineChart)
+            .on("mouseleave", handleMouseLeave)
         );
       },
       (update) => {
@@ -340,6 +362,18 @@ function handleLineChartClick(event, d) {
   } else {
     clearLineChartSelections(clickedYear);
   }
+
+  console.log(table_1_offenses);
+  createBarChart(
+    table_1_offenses,
+    true,
+    clickedYear,
+    defaultDataFilter,
+    xDefault,
+    600
+  );
+
+  lastClickedYear = clickedYear;
 }
 
 function clearLineChartSelections(year) {
@@ -395,7 +429,7 @@ function clearLineChartSelections(year) {
 }*/
 
 function parseDataTable(data, year) {
-  //console.log(data);
+  console.log(data);
   var out = [];
   var out_value;
   var bias_type;
@@ -438,12 +472,6 @@ function createBarChart(data, update, year, func, x, width) {
     .scaleOrdinal()
     .range(["#6b486b", "#a05d56", "#d0743c", "#ff8c00", "steelblue"]);
 
-  tooltip = d3
-    .select("body")
-    .append("div")
-    .attr("class", "tooltip")
-    .style("opacity", 0);
-
   y = d3
     .scaleLinear()
     .domain([0, 1])
@@ -460,9 +488,9 @@ function createBarChart(data, update, year, func, x, width) {
     g.attr("transform", `translate(${margin.left}, 0)`).call(
       d3
         .axisLeft(y)
-        //.tickFormat((i) => {
-        //  if (data[i].oscar_year % 3 == 0) return data[i].oscar_year;
-        //})
+        .tickFormat((i) => {
+          return Math.round(i * max);
+        })
         .tickSizeOuter(0)
     );
   }
@@ -752,6 +780,15 @@ function moveBackChart() {
 
   let element = document.getElementById("magicButton");
   element.setAttribute("hidden", "hidden");
+}
+
+function handleMouseHoverLineChart(event, d) {
+  tooltip.transition().duration(400).style("opacity", 1);
+
+  tooltip
+    .html("Total: " + d.total)
+    .style("left", event.pageX + "px")
+    .style("top", event.pageY + "px");
 }
 
 function handleMouseHover(event, d) {
