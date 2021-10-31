@@ -265,7 +265,7 @@ function createLineChart(table_11, update) {
         return d.year;
       })
     )
-    .range([margin.left, width - margin.right]);
+    .range([50, width - margin.right]);
   // 0 to max
   // y = d3
   //   .scaleLinear()
@@ -410,8 +410,7 @@ function handleLineChartClick(event, d) {
           return c;
         }
       })
-      .style("fill", "orange")
-      .attr("r", 8);
+      .style("fill", "orange");
 
     lineChartXaxis
       .selectAll("text")
@@ -449,6 +448,8 @@ function handleLineChartClick(event, d) {
   }
 
   lastClickedYear = clickedYear;
+  let element = document.getElementById("magicButton");
+  element.setAttribute("hidden", "hidden");
 }
 
 function clearLineChartSelections(year) {
@@ -599,6 +600,9 @@ function createBarChart(data, update, year, func, x, width) {
   //console.log("range: " + range);
   //console.log("height: " + (height - margin.bottom - y((d.value-min + 1) / range)))
   //200 - 20 - y((53-53)/63)
+  // console.log(new_data);
+  // new_data = new_data.sort((a, b) => d3.descending(a.value, b.value));
+  // console.log(new_data);
 
   svg
     .select("g.bars")
@@ -656,9 +660,17 @@ function createBarChart(data, update, year, func, x, width) {
     svg.append("g").attr("class", "yAxis");
   }
 
-  svg.select("g.xAxis").call(xAxis);
+  svg
+    .select("g.xAxis")
+    .call(xAxis)
+    .selectAll(".tick")
+    .attr("y", 6)
+    .attr("x", 6)
+    .style("text-anchor", "middle");
 
   svg.select("g.yAxis").call(yAxis);
+  //  svg.select("g.yAxis").attr("font-size", 13);
+
   console.log(svg.select("g.XAxis").selectAll(".tick"));
   svg
     .select("g.xAxis")
@@ -667,7 +679,7 @@ function createBarChart(data, update, year, func, x, width) {
       console.log("tou vivo oh maninho " + i);
       handleBarClick(i, data);
     });
-  //d3.select(".lineXAxis").attr("font-size", 13);
+  //svg.select("g.xAxis").attr("font-size", 13);
 }
 
 function handleBarClick(d, dataset) {
