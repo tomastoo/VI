@@ -7,7 +7,9 @@ var table_11_incidents_src = "data/table11-Incidents.csv";
 var table_11_offenses_src = "data/table11-Offenses.csv";
 var map = "data/countries-110m.json";
 
+var tooltip;
 var topology;
+var currentFilter;
 
 xDefault = d3
   .scaleBand()
@@ -39,6 +41,7 @@ Promise.all([d3.json(map), d3.csv(table_1_offenses_src)]).then(function ([
     xDefault,
     600
   );
+  currentFilter = "offenses";
 });
 
 /*************    CREATE LINE CHART   *************/
@@ -79,6 +82,7 @@ function changeViewNewData(button) {
           xDefault,
           600
         );
+        currentFilter = "victims";
       });
       break;
     case "offenders":
@@ -96,6 +100,7 @@ function changeViewNewData(button) {
           xDefault,
           600
         );
+        currentFilter = "offenders";
       });
       break;
 
@@ -114,6 +119,7 @@ function changeViewNewData(button) {
           xDefault,
           600
         );
+        currentFilter = "offenses";
       });
       break;
     case "incidents":
@@ -131,6 +137,7 @@ function changeViewNewData(button) {
           xDefault,
           600
         );
+        currentFilter = "incidents";
       });
       break;
     default:
@@ -360,7 +367,34 @@ function clearLineChartSelections(year) {
 
 /***********************************************************************************/
 
-function tableGetInfo(data, year) {
+/*function tableGetX(data) {
+    //console.log(data);
+    var out;
+    for (const [key, value] of Object.entries(data)) {
+        if (key == "Bias motivation" && value == 'Race:') {
+            out = value;
+        }
+        if (key == "Bias motivation" && value == 'Religion:') {
+            out = value;
+        }
+        if (key == "Bias motivation" && value == 'Sexual Orientation:') {
+            out = value;
+        }
+        if (key == "Bias motivation" && value == 'Ethnicity/National Origin:') {
+            out = value;
+        }
+        if (key == "Bias motivation" && value == 'Disability:') {
+            out = value;
+        }
+      if (key != "Bias motivation") {
+        out.push({ year: key, total: value });
+      }
+    }
+    //console.log(out);
+    return out.replace(":", "");
+}*/
+
+function parseDataTable(data, year) {
   //console.log(data);
   var out = [];
   var out_value;
@@ -404,6 +438,12 @@ function createBarChart(data, update, year, func, x, width) {
     .scaleOrdinal()
     .range(["#6b486b", "#a05d56", "#d0743c", "#ff8c00", "steelblue"]);
 
+  tooltip = d3
+    .select("body")
+    .append("div")
+    .attr("class", "tooltip")
+    .style("opacity", 0);
+
   y = d3
     .scaleLinear()
     .domain([0, 1])
@@ -441,7 +481,7 @@ function createBarChart(data, update, year, func, x, width) {
     .attr("width", width)
     .attr("height", height);
 
-  var dict_lines = tableGetInfo(data, year);
+  var dict_lines = parseDataTable(data, year);
   //console.log(dict_lines);
 
   new_data = dict_lines.filter(function (d) {
@@ -458,29 +498,26 @@ function createBarChart(data, update, year, func, x, width) {
     })
     .join(
       (enter) => {
-        return (
-          enter
-            .append("rect")
-            .attr("x", function (d) {
-              console.log(d);
-              return x(d.line.replace(":", ""));
-            })
-            .attr("y", (d) => y(d.value / max))
-            .attr("width", x.bandwidth() - 30)
-            .attr("height", (d) => height - margin.bottom - y(d.value / max))
-            .style("fill", function (d, i) {
-              return color(i);
-            })
-            //.on("mouseover", handleMouseHover)
-            //.on("mouseleave", handleMouseLeave)
-            .on("click", function (d, i) {
-              //console.log(d);
-              //console.log(i); //i é o d antigo
-              // console.log(d3.event);
-              //console.log("vivo");
-              handleBarClick(i, data);
-            })
-        );
+        return enter
+          .append("rect")
+          .attr("x", function (d, i) {
+            //console.log(d);
+            // console.log(i);
+            //console.log(x(i));
+            return x(d.line.replace(":", ""));
+            //return x(i);
+          })
+          .attr("y", (d) => y(d.value / max))
+          .attr("width", x.bandwidth() - 30)
+          .attr("height", (d) => height - margin.bottom - y(d.value / max))
+          .style("fill", function (d, i) {
+            return color(i);
+          })
+          .on("mouseover", handleMouseHover)
+          .on("mouseleave", handleMouseLeave)
+          .on("click", function (d, i) {
+            handleBarClick(i, data);
+          });
       },
       (update) => {
         update
@@ -493,7 +530,9 @@ function createBarChart(data, update, year, func, x, width) {
           .attr("height", (d) => height - margin.bottom - y(d.value / max))
           .style("background-color", function (d, i) {
             return color(i);
-          });
+          })
+          .on("mouseover", handleMouseHover)
+          .on("mouseleave", handleMouseLeave);
       },
       (exit) => {
         exit.remove();
@@ -514,6 +553,8 @@ function handleBarClick(d, dataset) {
   //console.log(d);
   //console.log(dataset);
 
+  tooltip.transition().duration(400).style("opacity", 0);
+
   switch (d.line) {
     case "Race:":
       // Show barchart related to race crimes
@@ -522,11 +563,12 @@ function handleBarClick(d, dataset) {
         .domain([
           "Anti-White",
           "Anti-Black",
-          "Anti-American Indian/Alaskan Native",
-          "Anti-Asian/Pacific Islander",
-          "Anti-Multiple Races, Group",
+          "Anti-Native American",
+          "Anti-Asian",
+          "Anti-Multiple Races",
         ]);
-      createBarChart(dataset, true, 2019, raceDataFilter, xRace, 800);
+      createBarChart(dataset, true, 2019, raceDataFilter, xRace, 600);
+      showBackButton();
       break;
     case "Religion:":
       // Show barchart related to religion crimes
@@ -538,10 +580,11 @@ function handleBarClick(d, dataset) {
           "Anti-Protestant",
           "Anti-Islamic",
           "Anti-Other Religion",
-          "Anti-Multiple Religions, Group",
-          "Anti-Atheism/Agnosticism/etc.",
+          "Anti-Multiple Religions",
+          "Anti-Atheism",
         ]);
-      createBarChart(dataset, true, 2019, religionDataFilter, xReligion, 900);
+      createBarChart(dataset, true, 2019, religionDataFilter, xReligion, 710);
+      showBackButton();
       break;
     case "Sexual Orientation:":
       xSexual = d3
@@ -554,12 +597,12 @@ function handleBarClick(d, dataset) {
           "Anti-Bisexual",
         ]);
       createBarChart(dataset, true, 2019, sexualDataFilter, xSexual, 600);
+      showBackButton();
       break;
     case "Ethnicity/National Origin:":
-      xE = d3
-        .scaleBand()
-        .domain(["Anti-Hispanic", "Anti-Other Ethnicity/National Origin"]);
+      xE = d3.scaleBand().domain(["Anti-Hispanic", "Anti-Other Ethnicity"]);
       createBarChart(dataset, true, 2019, ethnicityDataFilter, xE, 300);
+      showBackButton();
       break;
     case "Disability:":
       xDisability = d3.scaleBand().domain(["Anti-Physical", "Anti-Mental"]);
@@ -571,6 +614,7 @@ function handleBarClick(d, dataset) {
         xDisability,
         300
       );
+      showBackButton();
       break;
     default:
       break;
@@ -593,9 +637,9 @@ function raceDataFilter(d) {
   if (
     d.line == "Anti-White" ||
     d.line == "Anti-Black" ||
-    d.line == "Anti-American Indian/Alaskan Native" ||
-    d.line == "Anti-Asian/Pacific Islander" ||
-    d.line == "Anti-Multiple Races, Group"
+    d.line == "Anti-Native American" ||
+    d.line == "Anti-Asian" ||
+    d.line == "Anti-Multiple Races"
   ) {
     return d;
   }
@@ -608,8 +652,8 @@ function religionDataFilter(d) {
     d.line == "Anti-Protestant" ||
     d.line == "Anti-Islamic" ||
     d.line == "Anti-Other Religion" ||
-    d.line == "Anti-Multiple Religions, Group" ||
-    d.line == "Anti-Atheism/Agnosticism/etc."
+    d.line == "Anti-Multiple Religions" ||
+    d.line == "Anti-Atheism"
   ) {
     return d;
   }
@@ -628,10 +672,7 @@ function sexualDataFilter(d) {
 }
 
 function ethnicityDataFilter(d) {
-  if (
-    d.line == "Anti-Hispanic" ||
-    d.line == "Anti-Other Ethnicity/National Origin"
-  ) {
+  if (d.line == "Anti-Hispanic" || d.line == "Anti-Other Ethnicity") {
     return d;
   }
 }
@@ -640,4 +681,88 @@ function disabilityDataFilter(d) {
   if (d.line == "Anti-Physical" || d.line == "Anti-Mental") {
     return d;
   }
+}
+
+function showBackButton() {
+  let element = document.getElementById("magicButton");
+  element.removeAttribute("hidden");
+}
+
+function moveBackChart() {
+  switch (currentFilter) {
+    case "offenses":
+      Promise.all([d3.csv(table_1_offenses_src)]).then(function ([
+        table_1_offenses,
+      ]) {
+        createBarChart(
+          table_1_offenses,
+          true,
+          2019,
+          defaultDataFilter,
+          xDefault,
+          600
+        );
+      });
+      break;
+    case "victims":
+      Promise.all([d3.csv(table_1_victims_src)]).then(function ([
+        table_1_victims,
+      ]) {
+        createBarChart(
+          table_1_victims,
+          true,
+          2019,
+          defaultDataFilter,
+          xDefault,
+          600
+        );
+      });
+      break;
+    case "offenders":
+      Promise.all([d3.csv(table_1_offenders_src)]).then(function ([
+        table_1_offenders,
+      ]) {
+        createBarChart(
+          table_1_offenders,
+          true,
+          2019,
+          defaultDataFilter,
+          xDefault,
+          600
+        );
+      });
+      break;
+    case "incidents":
+      Promise.all([d3.csv(table_1_incidents_src)]).then(function ([
+        table_1_incidents,
+      ]) {
+        createBarChart(
+          table_1_incidents,
+          true,
+          2019,
+          defaultDataFilter,
+          xDefault,
+          600
+        );
+      });
+      break;
+    default:
+      break;
+  }
+
+  let element = document.getElementById("magicButton");
+  element.setAttribute("hidden", "hidden");
+}
+
+function handleMouseHover(event, d) {
+  tooltip.transition().duration(400).style("opacity", 1);
+
+  tooltip
+    .html("Total: " + d.value)
+    .style("left", event.pageX + "px")
+    .style("top", event.pageY + "px");
+}
+
+function handleMouseLeave(event, d) {
+  tooltip.transition().duration(400).style("opacity", 0);
 }
