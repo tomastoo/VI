@@ -38,15 +38,19 @@
     <link rel="stylesheet" href="libs/bootstrap.css" />
   </head>
   <body>
-    <div class="container">
-      <div class="row">
-        <div id="lineChart"></div>
+    <div id="vis">
+      <div class="idiom" id="lineChart">
+        <img src="information.png" />
+        <div class="infoBox">
+          <p><b>Book Publications</b></p>
+          <p>
+            Each cell encodes the number of books associated with the row's
+            genre and the column's year/month.
+          </p>
+          <p>Normalizing ensures sum of each columns equals to 1.</p>
+        </div>
       </div>
-      <div
-        id="mainButtons"
-        class="row justify-content-center"
-        style="margin-top: 10px;"
-      >
+      <!-- <div id="mainButtons" class="idiom" style="margin-top: 10px;">
         <div class="col-1"></div>
         <div class="col-md-auto">
           <button
@@ -96,19 +100,54 @@
             Incidents
           </button>
         </div>
+      </div> -->
+      <div class="idiom" id="barChart">
+        <img src="information.png" />
+        <div class="infoBox">
+          <p><b>Book Publications</b></p>
+          <p>
+            Each cell encodes the number of books associated with the row's
+            genre and the column's year/month.
+          </p>
+          <p>Normalizing ensures sum of each columns equals to 1.</p>
+        </div>
+        <button hidden type="button" id="magicButton" onclick="moveBackChart()">
+          Go back
+        </button>
       </div>
-      <div class="row" style="margin-top: 10px;">
-        <div id="barChart">
-          <button
-            hidden
-            type="button"
-            id="magicButton"
-            onclick="moveBackChart()"
-          >
-            Go back
-          </button>
+      <div class="idiom" id="lolipop">
+        <img src="information.png" />
+        <div class="infoBox">
+          <p><b>Book Publications</b></p>
+          <p>
+            Each cell encodes the number of books associated with the row's
+            genre and the column's year/month.
+          </p>
+          <p>Normalizing ensures sum of each columns equals to 1.</p>
         </div>
       </div>
+      <!-- <div class="idiom" id="radar">
+        <img src="information.png" />
+        <div class="infoBox">
+          <p><b>Book Publications</b></p>
+          <p>
+            Each cell encodes the number of books associated with the row's
+            genre and the column's year/month.
+          </p>
+          <p>Normalizing ensures sum of each columns equals to 1.</p>
+        </div>
+      </div>
+      <div class="idiom" id="map">
+        <img src="information.png" />
+        <div class="infoBox">
+          <p><b>Book Publications</b></p>
+          <p>
+            Each cell encodes the number of books associated with the row's
+            genre and the column's year/month.
+          </p>
+          <p>Normalizing ensures sum of each columns equals to 1.</p>
+        </div>
+      </div> -->
     </div>
   </body>
 </html>

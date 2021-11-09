@@ -42,47 +42,66 @@ Promise.all([d3.json(map), d3.csv(table_1_offenses_src)]).then(function ([
   map,
   table_1_offenses_,
 ]) {
-  //console.log(typeof table_1_offenses_);
-  table_1_offenses = table_1_offenses_;
-  // table_1_offenses = Object.assign({}, table_1_offenses_);
-
-  topology = map;
-  //console.log(table_1_offenses);
-  //console.log(map);
-  //trableReformatYearsSingleBias(table_11_offenses[1]);
-  tooltip = d3
-    .select("body")
-    .append("div")
-    .attr("class", "tooltip")
-    .style("opacity", 0);
-
-  createLineChart(table_1_offenses, false);
-  changeViewNewData("offenses");
-
-  if (lastClickedYear >= 2013) {
-    createBarChart(
-      table_1_offenses,
-      false,
-      lastClickedYear,
-      defaultDataFilter,
-      xDefault,
-      600
-    );
-  } else {
-    createBarChart(
-      table_1_offenses,
-      false,
-      lastClickedYear,
-      defaultDataFilter,
-      xDefaultprev,
-      600
-    );
-  }
-
-  currentFilter = "offenses";
-  handleLineChartClick(null, "2019");
+  prepareInfoButtons();
+  //
+  // table_1_offenses = table_1_offenses_;
+  //
+  // topology = map;
+  //
+  // tooltip = d3
+  //   .select("body")
+  //   .append("div")
+  //   .attr("class", "tooltip")
+  //   .style("opacity", 0);
+  //
+  // createLineChart(table_1_offenses, false);
+  // changeViewNewData("offenses");
+  //
+  // if (lastClickedYear >= 2013) {
+  //   createBarChart(
+  //     table_1_offenses,
+  //     false,
+  //     lastClickedYear,
+  //     defaultDataFilter,
+  //     xDefault,
+  //     600
+  //   );
+  // } else {
+  //   createBarChart(
+  //     table_1_offenses,
+  //     false,
+  //     lastClickedYear,
+  //     defaultDataFilter,
+  //     xDefaultprev,
+  //     600
+  //   );
+  // }
+  //
+  // currentFilter = "offenses";
+  // handleLineChartClick(null, "2019");
 });
 
+function prepareInfoButtons() {
+  console.log("isto esta a ser chamado");
+  var a = d3.selectAll(".infoBox");
+  console.log(a);
+  d3.selectAll(".infoBox")
+    .style("display", "none")
+    .on("mouseover", function () {
+      d3.select(this).style("display", null);
+    })
+    .on("mouseleave", function () {
+      d3.select(this).style("display", "none");
+    });
+
+  d3.selectAll(".idiom img")
+    .on("mouseover", function () {
+      d3.select(this.parentNode).select(".infoBox").style("display", null);
+    })
+    .on("mouseleave", function () {
+      d3.select(this.parentNode).select(".infoBox").style("display", "none");
+    });
+}
 /***************************BUTTONS HANDLING AREA (VICTIMS, OFFENDERS, OFFENSES, INCIDENTS) **************************************/
 function changeViewNewData(button) {
   switch (button) {

@@ -2,16 +2,16 @@ div {
   width: 100%;
   float: left;
 }
-div.tooltip {	
-  position: absolute;			
-  text-align: center;			
-  width: 70px;					
-  height: 25px;					
-  padding: 2px;				
-  font: 12px sans-serif;		
-  background: lightsteelblue;	
-  border: 0px;		
-  border-radius: 8px;			
+div.tooltip {
+  position: absolute;
+  text-align: center;
+  width: 70px;
+  height: 25px;
+  padding: 2px;
+  font: 12px sans-serif;
+  background: lightsteelblue;
+  border: 0px;
+  border-radius: 8px;
 }
 
 #magicButton {
@@ -20,4 +20,136 @@ div.tooltip {
   top: 220px;
 }
 
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
+.btn {
+  width: 100px;
+  font-family: arial, calibri, sans serif;
+  padding: 10px;
+  border: solid 1px black;
+  color: white;
+}
+
+#years {
+  background-color: red;
+}
+
+#months {
+  background-color: purple;
+}
+
+body {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+h1 {
+  font-size: 2.7em;
+  font-family: "Arial Black", Gadget, sans-serif;
+  font-weight: bolder;
+
+  color: #f77738;
+}
+
+p {
+  font-family: arial;
+}
+
+.infoBox {
+  position: absolute;
+  top: 23px;
+  right: 23px;
+  max-width: 300px;
+  z-index: 1;
+  background-color: #282c42;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.infoBox p {
+  color: white;
+  margin: 10px;
+}
+
+#vis {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-columns: repeat(16, 1fr);
+  grid-template-rows: 1fr 1.1fr 0.2fr;
+  background-color: #e8e8e8;
+}
+
+.idiom {
+  max-height: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  position: relative;
+  background-color: #f7f7f7;
+  border-radius: 8px;
+  margin: 5px;
+}
+
+.idiom img {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 20px;
+}
+
+.idiom svg {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+#year-slider {
+  background-color: #282c42;
+  border-radius: 0;
+}
+
+#title-card {
+  background-color: #282c42;
+  padding: 20px;
+}
+
+#title-card p {
+  font-size: 1.2em;
+  margin-top: 20%;
+  color: white;
+}
+
+#title-card a {
+  color: white;
+}
+
+/*grid area: rid-row-start / grid-column-start / grid-row-end / grid-column-end.*/
+#lineChart {
+  grid-area: 1/1/1/20;
+  margin: 5px 0px 0px 0px;
+}
+#barChart {
+  grid-area: 2/1/2/8;
+  margin: 5px 0px 0px 0px;
+}
+#lolipop {
+  grid-area: 6/1/12/8;
+  margin: 5px 0px 0px 0px;
+}
+#map {
+  grid-area: 1/1/3/17;
+  margin: 5px 0px 0px 0px;
+}
+#radar {
+  grid-area: 1/1/3/17;
+  margin: 5px 0px 0px 0px;
+}
+#mainButtons {
+  grid-area: 1/1/3/17;
+  margin: 5px 0px 0px 0px;
+}
