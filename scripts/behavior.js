@@ -53,26 +53,7 @@ Promise.all([d3.json(map), d3.csv(table_1_offenses_src)]).then(function ([
   createLineChart(table_1_offenses, false);
   changeViewNewData("offenses");
 
-  if (lastClickedYear >= 2013) {
-    createBarChart(
-      table_1_offenses,
-      false,
-      lastClickedYear,
-      defaultDataFilter,
-      xDefault,
-      600
-    );
-  } else {
-    createBarChart(
-      table_1_offenses,
-      false,
-      lastClickedYear,
-      defaultDataFilter,
-      xDefaultprev,
-      600
-    );
-  }
-
+  createBarChart(table_1_offenses, false, lastClickedYear, "CATEGORY");
   currentFilter = "offenses";
   handleLineChartClick(null, "2019");
 });
@@ -85,7 +66,7 @@ function trableReformatYearsSingleBias(data) {
   //console.log(data);
   out = [];
   for (const [key, value] of Object.entries(data)) {
-    if (key != "Bias motivation") {
+    if (key != "Bias motivation" && key != "YEAROW") {
       out.push({ year: key, total: value });
     }
   }
@@ -108,25 +89,8 @@ function changeViewNewData(button) {
         unselectAllButtons();
         selectButton(button);
         createLineChart(table_1_victims, true);
-        if (lastClickedYear >= 2013) {
-          createBarChart(
-            table_1_victims,
-            true,
-            lastClickedYear,
-            defaultDataFilter,
-            xDefault,
-            600
-          );
-        } else {
-          createBarChart(
-            table_1_victims,
-            true,
-            lastClickedYear,
-            defaultDataFilter,
-            xDefaultprev,
-            600
-          );
-        }
+        createBarChart(table_1_victims, true, lastClickedYear, "CATEGORY");
+
         currentFilter = "victims";
       });
       break;
@@ -138,25 +102,7 @@ function changeViewNewData(button) {
         unselectAllButtons();
         selectButton(button);
         createLineChart(table_1_offenders, true);
-        if (lastClickedYear >= 2013) {
-          createBarChart(
-            table_1_offenders,
-            true,
-            lastClickedYear,
-            defaultDataFilter,
-            xDefault,
-            600
-          );
-        } else {
-          createBarChart(
-            table_1_offenders,
-            true,
-            lastClickedYear,
-            defaultDataFilter,
-            xDefaultprev,
-            600
-          );
-        }
+        createBarChart(table_1_offenders, true, lastClickedYear, "CATEGORY");
         currentFilter = "offenders";
       });
       break;
@@ -169,25 +115,7 @@ function changeViewNewData(button) {
         unselectAllButtons();
         selectButton(button);
         createLineChart(table_1_offenses, true);
-        if (lastClickedYear >= 2013) {
-          createBarChart(
-            table_1_offenses,
-            true,
-            lastClickedYear,
-            defaultDataFilter,
-            xDefault,
-            600
-          );
-        } else {
-          createBarChart(
-            table_1_offenses,
-            true,
-            lastClickedYear,
-            defaultDataFilter,
-            xDefaultprev,
-            600
-          );
-        }
+        createBarChart(table_1_offenses, true, lastClickedYear, "CATEGORY");
 
         currentFilter = "offenses";
       });
@@ -200,25 +128,7 @@ function changeViewNewData(button) {
         unselectAllButtons();
         selectButton(button);
         createLineChart(table_1_incidents, true);
-        if (lastClickedYear >= 2013) {
-          createBarChart(
-            table_1_incidents,
-            true,
-            lastClickedYear,
-            defaultDataFilter,
-            xDefault,
-            600
-          );
-        } else {
-          createBarChart(
-            table_1_incidents,
-            true,
-            lastClickedYear,
-            defaultDataFilter,
-            xDefaultprev,
-            600
-          );
-        }
+        createBarChart(table_1_incidents, true, lastClickedYear, "CATEGORY");
 
         currentFilter = "incidents";
       });
@@ -427,24 +337,37 @@ function handleLineChartClick(event, d) {
   }
 
   //console.log(table_1_offenses);
-  if (clickedYear >= 2013) {
-    createBarChart(
-      table_1_offenses,
-      true,
-      clickedYear,
-      defaultDataFilter,
-      xDefault,
-      600
-    );
-  } else {
-    createBarChart(
-      table_1_offenses,
-      true,
-      clickedYear,
-      defaultDataFilter,
-      xDefaultprev,
-      600
-    );
+  switch (currentFilter) {
+    case "offenses":
+      Promise.all([d3.csv(table_1_offenses_src)]).then(function ([
+        table_1_offenses,
+      ]) {
+        createBarChart(table_1_offenses, true, clickedYear, "CATEGORY");
+      });
+      break;
+    case "victims":
+      Promise.all([d3.csv(table_1_victims_src)]).then(function ([
+        table_1_victims,
+      ]) {
+        createBarChart(table_1_victims, true, clickedYear, "CATEGORY");
+      });
+      break;
+    case "offenders":
+      Promise.all([d3.csv(table_1_offenders_src)]).then(function ([
+        table_1_offenders,
+      ]) {
+        createBarChart(table_1_offenders, true, clickedYear, "CATEGORY");
+      });
+      break;
+    case "incidents":
+      Promise.all([d3.csv(table_1_incidents_src)]).then(function ([
+        table_1_incidents,
+      ]) {
+        createBarChart(table_1_incidents, true, clickedYear, "CATEGORY");
+      });
+      break;
+    default:
+      break;
   }
 
   lastClickedYear = clickedYear;
@@ -509,6 +432,7 @@ function parseDataTable(data, year) {
   var out = [];
   var out_value;
   var bias_type;
+  var domain_type;
   for (const [key, value] of Object.entries(data)) {
     //console.log(value);
     //for (const [kkey, vvalue] of Object.entries(value)) {
@@ -520,21 +444,39 @@ function parseDataTable(data, year) {
       if (kkey == year) {
         out_value = vvalue;
       }
-      bias_type = vvalue;
+      if (kkey == "YEAROW") {
+        domain_type = vvalue;
+      }
+      if (kkey == "Bias motivation") {
+        bias_type = vvalue;
+      }
     }
-    out.push({ line: bias_type, value: out_value });
+    out.push({ line: bias_type, value: out_value, domain: domain_type});
     //break;
   }
   //console.log(out);
   return out;
 }
 
-function createBarChart(data, update, year, func, x, width) {
+function createBarChart(data, update, year, category) {
   height = 200;
+  width = 600;
 
   margin = { top: 20, right: 30, bottom: 20, left: 35 };
 
-  x.range([margin.left, width - margin.right]);
+  var dict_lines = parseDataTable(data, year);
+  filtered_data = dict_lines.filter(function(d) {
+    if (d.domain == category && d.value!=-1) {
+      return d;
+    }
+  });
+  console.log(filtered_data);
+  filtered_data.sort(function(b, a) {
+    return a.value - b.value;
+  });
+  console.log("after:\n");
+  console.log(filtered_data);
+  //console.log(filtered_data);
 
   var color = d3
     .scaleOrdinal()
@@ -547,6 +489,13 @@ function createBarChart(data, update, year, func, x, width) {
       "#2132b9",
     ]);
 
+  x = d3
+    .scaleBand()
+    .range([margin.left, width - margin.right])
+    .domain(filtered_data.map(function(d) { 
+      return d.line.replace(":", "");
+    }));
+  
   y = d3
     .scaleLinear()
     .domain([0, 1])
@@ -555,7 +504,7 @@ function createBarChart(data, update, year, func, x, width) {
 
   function xAxis(g) {
     g.attr("transform", `translate(0, ${height - margin.bottom})`).call(
-      d3.axisBottom(x).ticks(5)
+      d3.axisBottom(x).ticks(6)
     );
   }
 
@@ -584,16 +533,10 @@ function createBarChart(data, update, year, func, x, width) {
     .attr("width", width)
     .attr("height", height);
 
-  var dict_lines = parseDataTable(data, year);
-  //console.log(dict_lines);
 
-  new_data = dict_lines.filter(function (d) {
-    return func(d, year);
-  });
-  console.log(new_data);
-  console.log(data);
-  // bars
-  var max = getMax(new_data);
+
+
+  var max = getMax(filtered_data);
   var min = 0;
 
   var range = max - min;
@@ -607,7 +550,7 @@ function createBarChart(data, update, year, func, x, width) {
   svg
     .select("g.bars")
     .selectAll("rect")
-    .data(new_data, function (d) {
+    .data(filtered_data, function (d) {
       return d.value;
     })
     .join(
@@ -618,7 +561,7 @@ function createBarChart(data, update, year, func, x, width) {
             return x(d.line.replace(":", ""));
           })
           .attr("y", (d) => y((d.value - min) / range))
-          .attr("width", x.bandwidth() - 20)
+          .attr("width", x.bandwidth()-5)
           .attr(
             "height",
             (d) => height - margin.bottom - y((d.value - min) / range)
@@ -671,12 +614,12 @@ function createBarChart(data, update, year, func, x, width) {
   svg.select("g.yAxis").call(yAxis);
   //  svg.select("g.yAxis").attr("font-size", 13);
 
-  console.log(svg.select("g.XAxis").selectAll(".tick"));
+  //console.log(svg.select("g.XAxis").selectAll(".tick"));
   svg
     .select("g.xAxis")
     .selectAll(".tick")
     .on("click", function (event, i) {
-      console.log("tou vivo oh maninho " + i);
+      //console.log("tou vivo oh maninho " + i);
       handleBarClick(i, data);
     });
   //svg.select("g.xAxis").attr("font-size", 13);
@@ -694,107 +637,31 @@ function handleBarClick(d, dataset) {
   } else {
     bias_type = d.line;
   }
-  console.log(bias_type);
+  //console.log(bias_type);
   switch (bias_type) {
     case "Race:":
       // Show barchart related to race crimes
-      xRace = d3
-        .scaleBand()
-        .domain([
-          "Anti-White",
-          "Anti-Black",
-          "Anti-Native American",
-          "Anti-Asian",
-          "Anti-Multiple Races",
-        ]);
-      createBarChart(
-        dataset,
-        true,
-        lastClickedYear,
-        raceDataFilter,
-        xRace,
-        600
-      );
+      createBarChart(dataset, true, lastClickedYear, "RACE");
       showBackButton();
       break;
     case "Religion:":
       // Show barchart related to religion crimes
-      xReligion = d3
-        .scaleBand()
-        .domain([
-          "Anti-Jewish",
-          "Anti-Catholic",
-          "Anti-Protestant",
-          "Anti-Islamic",
-          "Anti-Others",
-          "Anti-Multiple",
-          "Anti-Atheism",
-        ]);
-      createBarChart(
-        dataset,
-        true,
-        lastClickedYear,
-        religionDataFilter,
-        xReligion,
-        710
-      );
+      createBarChart(dataset, true, lastClickedYear, "RELIGION");
       showBackButton();
       break;
     case "Sexual Orientation:":
-      xSexual = d3
-        .scaleBand()
-        .domain([
-          "Anti-Male Homosexual",
-          "Anti-Female Homosexual",
-          "Anti-Homosexual",
-          "Anti-Heterosexual",
-          "Anti-Bisexual",
-        ]);
-      createBarChart(
-        dataset,
-        true,
-        lastClickedYear,
-        sexualDataFilter,
-        xSexual,
-        600
-      );
+      createBarChart(dataset, true, lastClickedYear, "SEXUAL");
       showBackButton();
       break;
     case "Disability:":
-      xDisability = d3.scaleBand().domain(["Anti-Physical", "Anti-Mental"]);
-      createBarChart(
-        dataset,
-        true,
-        lastClickedYear,
-        disabilityDataFilter,
-        xDisability,
-        300
-      );
+      createBarChart(dataset, true, lastClickedYear, "DISABILITY");
       showBackButton();
       break;
     case "Gender:":
-      xGender = d3.scaleBand().domain(["Anti-male", "Anti-female"]);
-      createBarChart(
-        dataset,
-        true,
-        lastClickedYear,
-        genderDataFilter,
-        xGender,
-        300
-      );
-      ~showBackButton();
+      createBarChart(dataset, true, lastClickedYear, "GENDER");
+      showBackButton();
     case "Gender Identity:":
-      xGenderI = d3
-        .scaleBand()
-        .domain(["Anti-Transgender", "Anti-Gender Non-Conforming"]);
-      createBarChart(
-        dataset,
-        true,
-        lastClickedYear,
-        genderDataIdentityFilter,
-        xGenderI,
-        300
-      );
+      createBarChart(dataset, true, lastClickedYear, "GENDERI");
       showBackButton();
       break;
     default:
@@ -893,100 +760,28 @@ function moveBackChart() {
       Promise.all([d3.csv(table_1_offenses_src)]).then(function ([
         table_1_offenses,
       ]) {
-        if (lastClickedYear >= 2013) {
-          createBarChart(
-            table_1_offenses,
-            true,
-            lastClickedYear,
-            defaultDataFilter,
-            xDefault,
-            600
-          );
-        } else {
-          createBarChart(
-            table_1_offenses,
-            true,
-            lastClickedYear,
-            defaultDataFilter,
-            xDefaultprev,
-            600
-          );
-        }
+        createBarChart(table_1_offenses, true, lastClickedYear, "CATEGORY");
       });
       break;
     case "victims":
       Promise.all([d3.csv(table_1_victims_src)]).then(function ([
         table_1_victims,
       ]) {
-        if (lastClickedYear >= 2013) {
-          createBarChart(
-            table_1_victims,
-            true,
-            lastClickedYear,
-            defaultDataFilter,
-            xDefault,
-            600
-          );
-        } else {
-          createBarChart(
-            table_1_victims,
-            true,
-            lastClickedYear,
-            defaultDataFilter,
-            xDefaultprev,
-            600
-          );
-        }
+        createBarChart(table_1_victims, true, lastClickedYear, "CATEGORY");
       });
       break;
     case "offenders":
       Promise.all([d3.csv(table_1_offenders_src)]).then(function ([
         table_1_offenders,
       ]) {
-        if (lastClickedYear >= 2013) {
-          createBarChart(
-            table_1_offenders,
-            true,
-            lastClickedYear,
-            defaultDataFilter,
-            xDefault,
-            600
-          );
-        } else {
-          createBarChart(
-            table_1_offenders,
-            true,
-            lastClickedYear,
-            defaultDataFilter,
-            xDefaultprev,
-            600
-          );
-        }
+        createBarChart(table_1_offenders, true, lastClickedYear, "CATEGORY");
       });
       break;
     case "incidents":
       Promise.all([d3.csv(table_1_incidents_src)]).then(function ([
         table_1_incidents,
       ]) {
-        if (lastClickedYear >= 2013) {
-          createBarChart(
-            table_1_incidents,
-            true,
-            lastClickedYear,
-            defaultDataFilter,
-            xDefault,
-            600
-          );
-        } else {
-          createBarChart(
-            table_1_incidents,
-            true,
-            lastClickedYear,
-            defaultDataFilter,
-            xDefaultprev,
-            600
-          );
-        }
+        createBarChart(table_1_incidents, true, lastClickedYear, "CATEGORY");
       });
       break;
     default:
