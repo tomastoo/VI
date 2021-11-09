@@ -43,42 +43,42 @@ Promise.all([d3.json(map), d3.csv(table_1_offenses_src)]).then(function ([
   table_1_offenses_,
 ]) {
   prepareInfoButtons();
-  //
-  // table_1_offenses = table_1_offenses_;
-  //
-  // topology = map;
-  //
-  // tooltip = d3
-  //   .select("body")
-  //   .append("div")
-  //   .attr("class", "tooltip")
-  //   .style("opacity", 0);
-  //
-  // createLineChart(table_1_offenses, false);
-  // changeViewNewData("offenses");
-  //
-  // if (lastClickedYear >= 2013) {
-  //   createBarChart(
-  //     table_1_offenses,
-  //     false,
-  //     lastClickedYear,
-  //     defaultDataFilter,
-  //     xDefault,
-  //     600
-  //   );
-  // } else {
-  //   createBarChart(
-  //     table_1_offenses,
-  //     false,
-  //     lastClickedYear,
-  //     defaultDataFilter,
-  //     xDefaultprev,
-  //     600
-  //   );
-  // }
-  //
-  // currentFilter = "offenses";
-  // handleLineChartClick(null, "2019");
+
+  table_1_offenses = table_1_offenses_;
+
+  topology = map;
+
+  tooltip = d3
+    .select("body")
+    .append("div")
+    .attr("class", "tooltip")
+    .style("opacity", 0);
+
+  createLineChart(table_1_offenses, false);
+  changeViewNewData("offenses");
+
+  if (lastClickedYear >= 2013) {
+    createBarChart(
+      table_1_offenses,
+      false,
+      lastClickedYear,
+      defaultDataFilter,
+      xDefault,
+      600
+    );
+  } else {
+    createBarChart(
+      table_1_offenses,
+      false,
+      lastClickedYear,
+      defaultDataFilter,
+      xDefaultprev,
+      600
+    );
+  }
+
+  currentFilter = "offenses";
+  handleLineChartClick(null, "2019");
 });
 
 function prepareInfoButtons() {
@@ -331,7 +331,6 @@ function createLineChart(table_11, update) {
       .attr("class", "line")
       .attr("fill", "steelblue")
       .attr("clip-path", "url(#clip)");
-    //      .append("path");
   }
 
   const svg = d3
