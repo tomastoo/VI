@@ -15,23 +15,6 @@ var topology;
 var currentFilter;
 var lastClickedYear = 2019;
 
-xDefault = d3
-  .scaleBand()
-  .domain([
-    "Race",
-    "Religion",
-    "Sexual Orientation",
-    "Disability",
-    "Gender",
-    "Gender Identity",
-  ])
-  .range([0, 100]);
-
-xDefaultprev = d3
-  .scaleBand()
-  .domain(["Race", "Religion", "Sexual Orientation", "Disability"])
-  .range([0, 100]);
-
 Promise.all([d3.json(map), d3.csv(table_1_offenses_src)]).then(function ([
   map,
   table_1_offenses_,
@@ -470,13 +453,9 @@ function createBarChart(data, update, year, category) {
       return d;
     }
   });
-  console.log(filtered_data);
   filtered_data.sort(function(b, a) {
     return a.value - b.value;
   });
-  console.log("after:\n");
-  console.log(filtered_data);
-  //console.log(filtered_data);
 
   var color = d3
     .scaleOrdinal()
@@ -569,6 +548,7 @@ function createBarChart(data, update, year, category) {
           .style("fill", function (d, i) {
             return color(i);
           })
+          .style("opacity", 0.8)
           .on("mouseover", handleMouseHover)
           .on("mouseleave", handleMouseLeave)
           .on("click", function (d, i) {
@@ -590,6 +570,7 @@ function createBarChart(data, update, year, category) {
           .style("background-color", function (d, i) {
             return color(i);
           })
+          .style("opacity", 0.8)
           .on("mouseover", handleMouseHover)
           .on("mouseleave", handleMouseLeave);
       },
@@ -669,86 +650,6 @@ function handleBarClick(d, dataset) {
   }
 }
 
-function defaultDataFilter(d, year) {
-  if (year >= 2013) {
-    if (
-      d.line == "Race:" ||
-      d.line == "Religion:" ||
-      d.line == "Sexual Orientation:" ||
-      d.line == "Disability:" ||
-      d.line == "Gender:" ||
-      d.line == "Gender Identity:"
-    ) {
-      return d;
-    }
-  } else {
-    if (
-      d.line == "Race:" ||
-      d.line == "Religion:" ||
-      d.line == "Sexual Orientation:" ||
-      d.line == "Disability:"
-    ) {
-      return d;
-    }
-  }
-}
-
-function raceDataFilter(d, year) {
-  if (
-    d.line == "Anti-White" ||
-    d.line == "Anti-Black" ||
-    d.line == "Anti-Native American" ||
-    d.line == "Anti-Asian" ||
-    d.line == "Anti-Multiple Races"
-  ) {
-    return d;
-  }
-}
-
-function religionDataFilter(d, year) {
-  if (
-    d.line == "Anti-Jewish" ||
-    d.line == "Anti-Catholic" ||
-    d.line == "Anti-Protestant" ||
-    d.line == "Anti-Islamic" ||
-    d.line == "Anti-Others" ||
-    d.line == "Anti-Multiple" ||
-    d.line == "Anti-Atheism"
-  ) {
-    return d;
-  }
-}
-
-function sexualDataFilter(d, year) {
-  if (
-    d.line == "Anti-Male Homosexual" ||
-    d.line == "Anti-Female Homosexual" ||
-    d.line == "Anti-Homosexual" ||
-    d.line == "Anti-Heterosexual" ||
-    d.line == "Anti-Bisexual"
-  ) {
-    return d;
-  }
-}
-
-function disabilityDataFilter(d, year) {
-  if (d.line == "Anti-Physical" || d.line == "Anti-Mental") {
-    return d;
-  }
-}
-
-function genderDataFilter(d, year) {
-  if (d.line == "Anti-Male" || d.line == "Anti-Female") {
-    return d;
-  }
-}
-
-function genderDataIdentityFilter(d, year) {
-  if (d.line == "Anti-Transgender" || d.line == "Anti-Gender Non-Conforming") {
-    return d;
-  }
-}
-
 function showBackButton() {
   let element = document.getElementById("magicButton");
   element.removeAttribute("hidden");
@@ -805,13 +706,26 @@ function handleMouseHover(event, d) {
   tooltip.transition().duration(400).style("opacity", 1);
 
   tooltip
-    .html("Total: " + d.value)
+    .html("Bias-Motiv: " + d.line.replace(":", "") +"\nTotal: " + d.value)
     .style("left", event.pageX + "px")
     .style("top", event.pageY + "px");
+
+  barchart = d3.select("div#barChart").select("svg");
+
+  barchart.selectAll("rect").style("opacity", 0.2);
+
+  barchart.selectAll("rect")
+          .filter(function (b) {
+              if (d.line == b.line) {
+                return b;
+              }
+          })
+          .style("opacity", 1);
 }
 
 function handleMouseLeave(event, d) {
   tooltip.transition().duration(400).style("opacity", 0);
+  d3.select("div#barChart").select("svg").selectAll("rect").style("opacity", 0.8);
 }
 
 function getMax(data) {
