@@ -21,6 +21,8 @@ var currentFilter;
 var lastClickedYear = 2019;
 var selectedYears = [];
 
+var getBallsX;
+
 Promise.all([d3.json(map), d3.csv(table_1_offenses_src)]).then(function ([
   map,
   table_1_offenses_,
@@ -192,6 +194,7 @@ function createLineChart(table_11, update) {
   //   .scaleLinear()
   //   .domain([d3.min(data, (d) => d.total), d3.max(data, (d) => d.total)])
   //   .range([height - margin.bottom, margin.top]);
+  getBallsX = x;
 
   y = d3
     .scaleLinear()
@@ -319,6 +322,7 @@ function createLineChart(table_11, update) {
 
 function handleLineChartSelection(event, d) {
   selection = event.selection;
+  console.log(selection);
   if (selection === null) return;
 
   years = [];
@@ -328,14 +332,18 @@ function handleLineChartSelection(event, d) {
     .select("g.line")
     .selectAll("circle")
     .filter(function (c) {
-      cx = x(c.year);
+      console.log(c.year);
+
+      var cx = getBallsX(c.year);
+      console.log(cx);
+
       if (cx >= selection[0] && cx <= selection[1]) {
-        //console.log(c.year);
+        console.log(c.year);
         years.push(c.year);
       }
     });
 
-  //console.log(years);
+  console.log(years);
   if (typeof years === null) {
     return;
   }
@@ -345,7 +353,7 @@ function handleLineChartSelection(event, d) {
 }
 
 function handleLineChartClick(event, d) {
-  //console.log(selectedYears.length);
+  console.log(selectedYears.length);
   //console.log(typeof selectedYears.length);
   //  console.log(selectedYears);
 
@@ -518,7 +526,7 @@ function parseDataTable(data, year) {
         bias_type = vvalue;
       }
     }
-    out.push({ line: bias_type, value: out_value, domain: domain_type});
+    out.push({ line: bias_type, value: out_value, domain: domain_type });
     //break;
   }
   //console.log(out);
@@ -532,12 +540,12 @@ function createBarChart(data, update, year, category) {
   margin = { top: 20, right: 30, bottom: 20, left: 35 };
 
   var dict_lines = parseDataTable(data, year);
-  filtered_data = dict_lines.filter(function(d) {
-    if (d.domain == category && d.value!=-1) {
+  filtered_data = dict_lines.filter(function (d) {
+    if (d.domain == category && d.value != -1) {
       return d;
     }
   });
-  filtered_data.sort(function(b, a) {
+  filtered_data.sort(function (b, a) {
     return a.value - b.value;
   });
 
@@ -555,10 +563,12 @@ function createBarChart(data, update, year, category) {
   x = d3
     .scaleBand()
     .range([margin.left, width - margin.right])
-    .domain(filtered_data.map(function(d) { 
-      return d.line.replace(":", "");
-    }));
-  
+    .domain(
+      filtered_data.map(function (d) {
+        return d.line.replace(":", "");
+      })
+    );
+
   y = d3
     .scaleLinear()
     .domain([0, 1])
@@ -596,9 +606,6 @@ function createBarChart(data, update, year, category) {
     .attr("width", width)
     .attr("height", height);
 
-
-
-
   var max = getMax(filtered_data);
   var min = 0;
 
@@ -624,7 +631,7 @@ function createBarChart(data, update, year, category) {
             return x(d.line.replace(":", ""));
           })
           .attr("y", (d) => y((d.value - min) / range))
-          .attr("width", x.bandwidth()-5)
+          .attr("width", x.bandwidth() - 5)
           .attr(
             "height",
             (d) => height - margin.bottom - y((d.value - min) / range)
@@ -790,7 +797,7 @@ function handleMouseHover(event, d) {
   tooltip.transition().duration(400).style("opacity", 1);
 
   tooltip
-    .html("Bias-Motiv: " + d.line.replace(":", "") +"\nTotal: " + d.value)
+    .html("Bias-Motiv: " + d.line.replace(":", "") + "\nTotal: " + d.value)
     .style("left", event.pageX + "px")
     .style("top", event.pageY + "px");
 
@@ -798,18 +805,22 @@ function handleMouseHover(event, d) {
 
   barchart.selectAll("rect").style("opacity", 0.2);
 
-  barchart.selectAll("rect")
-          .filter(function (b) {
-              if (d.line == b.line) {
-                return b;
-              }
-          })
-          .style("opacity", 1);
+  barchart
+    .selectAll("rect")
+    .filter(function (b) {
+      if (d.line == b.line) {
+        return b;
+      }
+    })
+    .style("opacity", 1);
 }
 
 function handleMouseLeave(event, d) {
   tooltip.transition().duration(400).style("opacity", 0);
-  d3.select("div#barChart").select("svg").selectAll("rect").style("opacity", 0.8);
+  d3.select("div#barChart")
+    .select("svg")
+    .selectAll("rect")
+    .style("opacity", 0.8);
 }
 
 function getMax(data) {
