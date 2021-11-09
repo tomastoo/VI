@@ -10,10 +10,16 @@ var table_1_offenders;
 
 var map = "data/countries-110m.json";
 
+/*COLORS*/
+var ballColor = "#dc3545";
+var selectedBallColor = "black";
+var lineColor = "red";
+
 var tooltip;
 var topology;
 var currentFilter;
 var lastClickedYear = 2019;
+var selectedYears = [];
 
 xDefault = d3
   .scaleBand()
@@ -77,27 +83,7 @@ Promise.all([d3.json(map), d3.csv(table_1_offenses_src)]).then(function ([
   handleLineChartClick(null, "2019");
 });
 
-/*************    CREATE LINE CHART   *************/
-
-/*This function converts a line from table with format |2005,..2019, singleBias|
-to |singleBias, years|*/
-function trableReformatYearsSingleBias(data) {
-  //console.log(data);
-  out = [];
-  for (const [key, value] of Object.entries(data)) {
-    if (key != "Bias motivation") {
-      out.push({ year: key, total: value });
-    }
-  }
-  // var max = d3.max(out, (d) => d.total);
-  //
-  // for (var i = 0; i < out.length; i++) {
-  //   out[i]["norm"] = out[i].total / max;
-  // }
-  //console.log(out);
-  return out;
-}
-
+/***************************BUTTONS HANDLING AREA (VICTIMS, OFFENDERS, OFFENSES, INCIDENTS) **************************************/
 function changeViewNewData(button) {
   switch (button) {
     case "victims":
@@ -239,6 +225,28 @@ function unselectAllButtons() {
     .selectAll("button")
     .attr("class", "btn btn-secondary btn-sm");
 }
+/**************************************************************************************/
+
+/*************    CREATE LINE CHART   *************/
+
+/*This function converts a line from table with format |2005,..2019, singleBias|
+to |singleBias, years|*/
+function trableReformatYearsSingleBias(data) {
+  //console.log(data);
+  out = [];
+  for (const [key, value] of Object.entries(data)) {
+    if (key != "Bias motivation") {
+      out.push({ year: key, total: value });
+    }
+  }
+  // var max = d3.max(out, (d) => d.total);
+  //
+  // for (var i = 0; i < out.length; i++) {
+  //   out[i]["norm"] = out[i].total / max;
+  // }
+  //console.log(out);
+  return out;
+}
 
 function createLineChart(table_11, update) {
   const width = 1450;
@@ -297,12 +305,14 @@ function createLineChart(table_11, update) {
   }
 
   if (!update) {
-    d3.select("div#lineChart")
+    var line = d3
+      .select("div#lineChart")
       .append("svg")
       .append("g")
       .attr("class", "line")
       .attr("fill", "steelblue")
-      .append("path");
+      .attr("clip-path", "url(#clip)");
+    //      .append("path");
   }
 
   const svg = d3
@@ -314,6 +324,29 @@ function createLineChart(table_11, update) {
   if (!update) {
     svg.append("g").attr("class", "lineXAxis");
     svg.append("g").attr("class", "lineYAxis");
+    var clip = svg
+      .append("defs")
+      .append("svg:clipPath")
+      .attr("id", "clip")
+      .append("svg:rect")
+      .attr("width", width)
+      .attr("height", height)
+      .attr("x", 0)
+      .attr("y", 0);
+
+    // Add brushing
+    var brush = d3
+      .brushX() // Add the brush feature using the d3.brush function
+      .extent([
+        [0, 0],
+        [width, height],
+      ]) // initialise the brush area: start at 0,0 and finishes at width,height: it means I select the whole graph area
+      .on("end", handleLineChartSelection); // Each time the brush selection changes, trigger the 'updateChart' function
+
+    console.log(line);
+    // Add the brushing
+    line.append("g").attr("class", "brush").call(brush);
+    line.append("path");
   }
 
   svg.select("g.lineXAxis").call(xAxis);
@@ -329,7 +362,7 @@ function createLineChart(table_11, update) {
     .select("path")
     .datum(data)
     .attr("fill", "none")
-    .attr("stroke", "red")
+    .attr("stroke", lineColor)
     .attr("stroke-width", 1.5)
     // to lines above are not needed for this case said the dude on the video
     // .attr("stroke-linejoin", "round")
@@ -348,8 +381,8 @@ function createLineChart(table_11, update) {
         return (
           enter
             .append("circle")
-            .attr("stroke", "black")
-            .attr("fill", "black")
+            .attr("stroke", ballColor)
+            .attr("fill", ballColor)
             // .attr("stroke-width", 1.5)
             .attr("cx", (d) => x(d.year))
             .attr("cy", (d) => y(d.total / max))
@@ -371,18 +404,39 @@ function createLineChart(table_11, update) {
     );
 }
 
-var selectedYears = [];
+function handleLineChartSelection(event, d) {
+  selection = event.selection;
+  if (selection === null) return;
+
+  years = [];
+  circles = d3
+    .select("div#lineChart")
+    .select("svg")
+    .select("g.line")
+    .selectAll("circle")
+    .filter(function (c) {
+      cx = x(c.year);
+      if (cx >= selection[0] && cx <= selection[1]) {
+        //console.log(c.year);
+        years.push(c.year);
+      }
+    });
+
+  //console.log(years);
+  if (typeof years === null) {
+    return;
+  }
+  if (years.length < 1) return;
+
+  handleLineChartClick(null, years);
+}
 
 function handleLineChartClick(event, d) {
   //console.log(selectedYears.length);
   //console.log(typeof selectedYears.length);
+  //  console.log(selectedYears);
 
-  // Primeiro vou filtrar todas as selections
-  if (selectedYears.length != 0) {
-    selectedYears.forEach(function (year, index) {
-      clearLineChartSelections(year);
-    });
-  }
+  //  Primeiro vou filtrar todas as selections
 
   // vou chamar o desenho do linechart tal e o eixo dos x porque quero
   //     meter a bold e noutra cor o texto
@@ -391,17 +445,30 @@ function handleLineChartClick(event, d) {
 
   // Visto que a data pode vir do eixo dos anos como pode vir da bolinha
   // depende onde clicamos entao temos de uniformizar a coisa.
-  var clickedYear;
-  if (d.year != null) {
-    clickedYear = d.year;
+  if (typeof [] === typeof d) {
+    if (d.year != null) {
+      if (selectedYears.indexOf(d.year) == -1) selectedYears.push(d.year);
+      console.log("circle click");
+    } else {
+      console.log(selectedYears);
+      console.log("selectedYears.length = " + selectedYears.length);
+      for (let i = 0; i < selectedYears.length; i++) {
+        console.log(i);
+        console.log(selectedYears[i]);
+        clearLineChartSelections(selectedYears[i]);
+        //after a splice if you continue the iteration i-- is necessary other wise
+        // mayem will happen on deselecting years DO NOT DELETE THIS
+        i--;
+      }
+      selectedYears = d;
+      console.log("array selection");
+    }
   } else {
-    clickedYear = d;
+    console.log("text click");
+    if (selectedYears.indexOf(d) == -1) selectedYears.push([d]);
   }
 
-  //console.log(clickedYear);
-  // se o ano clicado ja tiver selecionado vou apagar so
-  if (selectedYears.indexOf(clickedYear) === -1) {
-    selectedYears.push(clickedYear);
+  selectedYears.forEach(function (clickedYear) {
     lineChart
       .selectAll("circle")
       .filter(function (c) {
@@ -410,7 +477,7 @@ function handleLineChartClick(event, d) {
           return c;
         }
       })
-      .style("fill", "orange");
+      .style("fill", selectedBallColor);
 
     lineChartXaxis
       .selectAll("text")
@@ -422,11 +489,11 @@ function handleLineChartClick(event, d) {
       })
       .attr("class", "text-danger")
       .style("font-weight", "bold");
-  } else {
-    clearLineChartSelections(clickedYear);
-  }
+  });
 
-  //console.log(table_1_offenses);
+  //TODO
+  // TEMPORARIO APENAS PARA O BARCHART NAO REBENTAR
+  var clickedYear = 2019;
   if (clickedYear >= 2013) {
     createBarChart(
       table_1_offenses,
@@ -448,12 +515,11 @@ function handleLineChartClick(event, d) {
   }
 
   lastClickedYear = clickedYear;
-  let element = document.getElementById("magicButton");
-  element.setAttribute("hidden", "hidden");
 }
 
 function clearLineChartSelections(year) {
   selectedYears.splice(selectedYears.indexOf(year), 1);
+  // isto esta aqui porque a linha acima nao apaga para arrays com um so elemento
   lineChart
     .selectAll("circle")
     .filter(function (c) {
@@ -461,7 +527,7 @@ function clearLineChartSelections(year) {
         return c;
       }
     })
-    .style("fill", "black")
+    .style("fill", ballColor)
     .attr("r", 5);
 
   lineChartXaxis
