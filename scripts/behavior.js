@@ -59,7 +59,6 @@ Promise.all([d3.json(map), d3.csv(table_1_offenses_src)]).then(function ([
 
   createBarChart(table_1_offenses, false, selectedYears, "CATEGORY");
   currentFilter = "offenses";
-  handleLineChartClick(null, "2019");
 });
 
 function prepareInfoButtons() {
@@ -178,8 +177,8 @@ function trableReformatYearsSingleBias(data) {
 }
 
 function createLineChart(table_11, update) {
-  const width = 1450;
-  const height = 150;
+  const width = 1430;
+  const height = 130;
   margin = { top: 10, right: 15, bottom: 20, left: 35 };
 
   // //console.log(table_11[1]);
@@ -237,7 +236,8 @@ function createLineChart(table_11, update) {
   if (!update) {
     var line = d3
       .select("div#lineChart")
-      .append("svg")
+      .select("svg")
+      //.attr("viewbox", "0 0 " + width + " " + height)
       .append("g")
       .attr("class", "line")
       .attr("fill", "steelblue")
@@ -550,7 +550,7 @@ function createBarChart(data, update, years, category) {
   height = 200;
   width = 600;
 
-  margin = { top: 20, right: 30, bottom: 20, left: 35 };
+  margin = { top: 8, right: 30, bottom: 20, left: 35 };
 
   console.log(years);
 
@@ -611,7 +611,7 @@ function createBarChart(data, update, years, category) {
 
   if (!update) {
     d3.select("div#barChart")
-      .append("svg")
+      .select("svg")
       .append("g")
       .attr("class", "bars")
       .attr("fill", "steelblue");
