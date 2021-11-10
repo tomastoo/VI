@@ -27,13 +27,13 @@ Promise.all([d3.json(map), d3.csv(table_1_offenses_src)]).then(function ([
   map,
   table_1_offenses_,
 ]) {
-  ////console.log(typeof table_1_offenses_);
+  //////console.log(typeof table_1_offenses_);
   table_1_offenses = table_1_offenses_;
   // table_1_offenses = Object.assign({}, table_1_offenses_);
 
   topology = map;
-  ////console.log(table_1_offenses);
-  ////console.log(map);
+  //////console.log(table_1_offenses);
+  //////console.log(map);
   //trableReformatYearsSingleBias(table_11_offenses[1]);
   tooltip = d3
     .select("body")
@@ -54,7 +54,7 @@ Promise.all([d3.json(map), d3.csv(table_1_offenses_src)]).then(function ([
 /*This function converts a line from table with format |2005,..2019, singleBias|
 to |singleBias, years|*/
 function trableReformatYearsSingleBias(data) {
-  ////console.log(data);
+  //////console.log(data);
   out = [];
   for (const [key, value] of Object.entries(data)) {
     if (key != "Bias motivation" && key != "YEAROW") {
@@ -66,7 +66,7 @@ function trableReformatYearsSingleBias(data) {
   // for (var i = 0; i < out.length; i++) {
   //   out[i]["norm"] = out[i].total / max;
   // }
-  ////console.log(out);
+  //////console.log(out);
   return out;
 }
 
@@ -147,7 +147,7 @@ function unselectAllButtons() {
 /*This function converts a line from table with format |2005,..2019, singleBias|
 to |singleBias, years|*/
 function trableReformatYearsSingleBias(data) {
-  ////console.log(data);
+  //////console.log(data);
   out = [];
   for (const [key, value] of Object.entries(data)) {
     if (key != "Bias motivation" && key != "YEAROW") {
@@ -159,7 +159,7 @@ function trableReformatYearsSingleBias(data) {
   // for (var i = 0; i < out.length; i++) {
   //   out[i]["norm"] = out[i].total / max;
   // }
-  ////console.log(out);
+  //////console.log(out);
   return out;
 }
 
@@ -168,13 +168,11 @@ function createLineChart(table_11, update) {
   const height = 150;
   margin = { top: 10, right: 15, bottom: 20, left: 35 };
 
-  // //console.log(table_11[1]);
   data = trableReformatYearsSingleBias(table_11[1]);
   var max = d3.max(data, (d) => d.total);
   line = d3
     .line()
     .defined(function (d) {
-      //   //console.log(d);
       return d.year;
     })
     .x((d) => x(d.year))
@@ -189,11 +187,8 @@ function createLineChart(table_11, update) {
       })
     )
     .range([50, width - margin.right]);
-  // 0 to max
-  // y = d3
-  //   .scaleLinear()
-  //   .domain([d3.min(data, (d) => d.total), d3.max(data, (d) => d.total)])
-  //   .range([height - margin.bottom, margin.top]);
+
+
   getBallsX = x;
 
   y = d3
@@ -270,18 +265,12 @@ function createLineChart(table_11, update) {
   d3.select(".lineXAxis").selectAll(".tick").on("click", handleLineChartClick);
   d3.select(".lineXAxis").attr("font-size", 13);
 
-  // datum picks all the data
-  // if we wanted more than one line (more than one dataset) then we would need
-  // to use the data() method
   svg
     .select("path")
     .datum(data)
     .attr("fill", "none")
     .attr("stroke", lineColor)
     .attr("stroke-width", 1.5)
-    // to lines above are not needed for this case said the dude on the video
-    // .attr("stroke-linejoin", "round")
-    // .attr("stroke-linecap", "round")
     .attr("d", line);
 
   svg
@@ -346,9 +335,9 @@ function handleLineChartSelection(event, d) {
 }
 
 function handleLineChartClick(event, d) {
-  ////console.log(selectedYears.length);
-  ////console.log(typeof selectedYears.length);
-  //  //console.log(selectedYears);
+  //////console.log(selectedYears.length);
+  //////console.log(typeof selectedYears.length);
+  //  ////console.log(selectedYears);
 
   //  Primeiro vou filtrar todas as selections
 
@@ -362,23 +351,23 @@ function handleLineChartClick(event, d) {
   if (typeof [] === typeof d) {
     if (d.year != null) {
       if (selectedYears.indexOf(d.year) == -1) selectedYears.push(d.year);
-      ////console.log("circle click");
+      //////console.log("circle click");
     } else {
-      //console.log(selectedYears);
-      //console.log("selectedYears.length = " + selectedYears.length);
+      ////console.log(selectedYears);
+      ////console.log("selectedYears.length = " + selectedYears.length);
       for (let i = 0; i < selectedYears.length; i++) {
-        //console.log(i);
-        //console.log(selectedYears[i]);
+        ////console.log(i);
+        ////console.log(selectedYears[i]);
         clearLineChartSelections(selectedYears[i]);
         //after a splice if you continue the iteration i-- is necessary other wise
         // mayem will happen on deselecting years DO NOT DELETE THIS
         i--;
       }
       selectedYears = d;
-      //console.log("array selection");
+      ////console.log("array selection");
     }
   } else {
-    //console.log("text click");
+    ////console.log("text click");
     d = parseInt(d);
     if (selectedYears.indexOf(d) == -1) selectedYears.push(d);
   }
@@ -387,7 +376,7 @@ function handleLineChartClick(event, d) {
     lineChart
       .selectAll("circle")
       .filter(function (c) {
-        ////console.log(c);
+        //////console.log(c);
         if (clickedYear == c.year || clickedYear == c) {
           return c;
         }
@@ -397,7 +386,7 @@ function handleLineChartClick(event, d) {
     lineChartXaxis
       .selectAll("text")
       .filter(function (c) {
-        ////console.log(c);
+        //////console.log(c);
         if (clickedYear == c.year || clickedYear == c) {
           return c;
         }
@@ -406,7 +395,7 @@ function handleLineChartClick(event, d) {
       .style("font-weight", "bold");
   });
   var clickedYear = 2019;
-  ////console.log(table_1_offenses);
+  //////console.log(table_1_offenses);
   switch (currentFilter) {
     case "offenses":
       Promise.all([d3.csv(table_1_offenses_src)]).then(function ([
@@ -469,54 +458,18 @@ function clearLineChartSelections(year) {
 
 /***********************************************************************************/
 
-/*function tableGetX(data) {
-    ////console.log(data);
-    var out;
-    for (const [key, value] of Object.entries(data)) {
-        if (key == "Bias motivation" && value == 'Race:') {
-            out = value;
-        }
-        if (key == "Bias motivation" && value == 'Religion:') {
-            out = value;
-        }
-        if (key == "Bias motivation" && value == 'Sexual Orientation:') {
-            out = value;
-        }
-        if (key == "Bias motivation" && value == 'Ethnicity/National Origin:') {
-            out = value;
-        }
-        if (key == "Bias motivation" && value == 'Disability:') {
-            out = value;
-        }
-      if (key != "Bias motivation") {
-        out.push({ year: key, total: value });
-      }
-    }
-    ////console.log(out);
-    return out.replace(":", "");
-}*/
-
 function parseDataTable(data, years) {
-  //console.log("data:\n");
-  //console.log(data);
+
   var out = [];
   var out_value = 0;
   var bias_type;
   var domain_type;
   for (const [key, value] of Object.entries(data)) {
-    ////console.log(value);
-    //for (const [kkey, vvalue] of Object.entries(value)) {
-    //  //console.log(kkey);
-    //    //console.log(vvalue);
-    //}~
-    //console.log("antes do segundo for:");
+
     out_value = 0;
-    //console.log(out_value);
     for (const [kkey, vvalue] of Object.entries(value)) {
       for (let i = 0; i < years.length; i++) {
         if (kkey == years[i]) {
-          //console.log("existe ano");
-          //console.log("outvalue = " + out_value + "\nvvalue = " + vvalue + "out_value = " + out_value);
           out_value += parseInt(vvalue);
         }
         else if (kkey == "YEAROW") {
@@ -527,13 +480,23 @@ function parseDataTable(data, years) {
         }
       }
     }
-    //console.log("final out_value: " + out_value);
-    //console.log("line: " + bias_type + "\tvalue: " + out_value + "\tdomain: " + domain_type);
     out.push({ line: bias_type, value: out_value, domain: domain_type });
   }
-  //console.log("after:\n");
-  //console.log(out);
   return out;
+}
+
+function barTranslateFunction(ticks, x) {
+
+  if (ticks == 8 || ticks == 7) {
+      return x.bandwidth() / ticks + 20;
+  }
+  else if (ticks == 2) {
+    return x.bandwidth() / ticks - 5;
+  }
+  else {
+    return x.bandwidth() / ticks + 25;
+  }
+  
 }
 
 function createBarChart(data, update, years, category) {
@@ -542,7 +505,7 @@ function createBarChart(data, update, years, category) {
 
   margin = { top: 20, right: 30, bottom: 20, left: 35 };
 
-  console.log(years);
+  //console.log(years);
 
   var dict_lines = parseDataTable(data, years);
 
@@ -583,13 +546,13 @@ function createBarChart(data, update, years, category) {
   //.padding(0.5);
 
   function xAxis(g) {
-    g.attr("transform", `translate(0, ${height - margin.bottom})`).call(
+    g.attr("transform", `translate(25, ${height - margin.bottom})`).call(
       d3.axisBottom(x).ticks(6)
     );
   }
 
   function yAxis(g) {
-    g.attr("transform", `translate(${margin.left + 1}, 0)`).call(
+    g.attr("transform", `translate(${margin.left + 25}, 0)`).call(
       d3
         .axisLeft(y)
         .tickFormat((i) => {
@@ -611,18 +574,14 @@ function createBarChart(data, update, years, category) {
     .select("div#barChart")
     .select("svg")
     .attr("width", width)
-    .attr("height", height);
+    .attr("height", 220);
 
   var max = getMax(filtered_data);
   var min = 0;
-
   var range = max - min;
-  ////console.log("range: " + range);
-  ////console.log("height: " + (height - margin.bottom - y((d.value-min + 1) / range)))
-  //200 - 20 - y((53-53)/63)
-  // //console.log(new_data);
-  // new_data = new_data.sort((a, b) => d3.descending(a.value, b.value));
-  // //console.log(new_data);
+
+  // Small corrections on the position of the bars
+  var ticks = filtered_data.length;
 
   svg
     .select("g.bars")
@@ -638,7 +597,9 @@ function createBarChart(data, update, years, category) {
             return x(d.line.replace(":", ""));
           })
           .attr("y", (d) => y((d.value - min) / range))
-          .attr("width", x.bandwidth() - 5)
+          .attr("width", () => {
+            return 60;
+          })
           .attr(
             "height",
             (d) => height - margin.bottom - y((d.value - min) / range)
@@ -647,20 +608,22 @@ function createBarChart(data, update, years, category) {
             return color(i);
           })
           .style("opacity", 0.8)
+          .attr("transform", "translate("+ barTranslateFunction(ticks, x) +",0)")
           .on("mouseover", handleMouseHover)
           .on("mouseleave", handleMouseLeave)
-          .on("click", function (d, i) {
-            handleBarClick(i, data);
+          .on("click", function (event, d) {
+            handleBarClick(d, data);
           });
       },
       (update) => {
         update
           .attr("x", function (d) {
-            ////console.log(d);
             return x(d.line.replace(":", ""));
           })
           .attr("y", (d) => y((d.value - min) / range))
-          .attr("width", x.bandwidth() - 20)
+          .attr("width", () => {
+            return 60;
+          })
           .attr(
             "height",
             (d) => height - margin.bottom - y((d.value - min) / range)
@@ -669,6 +632,7 @@ function createBarChart(data, update, years, category) {
             return color(i);
           })
           .style("opacity", 0.8)
+          .attr("transform", "translate("+ barTranslateFunction(ticks, x) +",0)")
           .on("mouseover", handleMouseHover)
           .on("mouseleave", handleMouseLeave);
       },
@@ -685,38 +649,41 @@ function createBarChart(data, update, years, category) {
   svg
     .select("g.xAxis")
     .call(xAxis)
-    .selectAll(".tick")
-    .attr("y", 6)
-    .attr("x", 6)
-    .style("text-anchor", "middle");
+    .append("text")
+    .attr("y", height - 165)    
+    .attr("x", width - 250)
+    .attr("text-anchor", "end")
+    .attr("fill", "black")
+    .attr("font-size", "12")
+    .text("Bias motivation");
 
-  svg.select("g.yAxis").call(yAxis);
-  //  svg.select("g.yAxis").attr("font-size", 13);
-
-  ////console.log(svg.select("g.XAxis").selectAll(".tick"));
-  svg
-    .select("g.xAxis")
-    .selectAll(".tick")
-    .on("click", function (event, i) {
-      ////console.log("tou vivo oh maninho " + i);
-      handleBarClick(i, data);
-    });
-  //svg.select("g.xAxis").attr("font-size", 13);
+  svg.select("g.yAxis").call(yAxis)
+      .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 10)
+      .attr("dy", "-5.1em")
+      .attr("text-anchor", "end")
+      .attr("fill", "black")
+      .attr("font-size", "11")
+      .text("Stock Price");
+  
+  d3.select(".xAxis").selectAll(".tick").on("click", function (event, d) {
+    handleBarClick(d, data);
+  });
+  d3.select(".xAxis").attr("font-size", 11);
 }
 
 function handleBarClick(d, dataset) {
-  ////console.log(d);
-  ////console.log(dataset);
-
-  tooltip.transition().duration(400).style("opacity", 0);
 
   var bias_type;
-  if (d.line == null) {
+  tooltip.transition().duration(400).style("opacity", 0);
+
+  if (d.line == undefined) {
     bias_type = d + ":";
   } else {
     bias_type = d.line;
   }
-  ////console.log(bias_type);
+
   switch (bias_type) {
     case "Race:":
       // Show barchart related to race crimes
