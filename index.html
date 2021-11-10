@@ -38,67 +38,79 @@
     <link rel="stylesheet" href="libs/bootstrap.css" />
   </head>
   <body>
-    <div class="container">
-      <div class="row">
-        <div id="lineChart"></div>
+    <div id="vis">
+      <div class="idiom" id="title">
+        <h2>Hate Crimes In The US</h2>
       </div>
-      <div
-        id="mainButtons"
-        class="row justify-content-center"
-        style="margin-top: 10px;"
-      >
-        <div class="col-1"></div>
-        <div class="col-md-auto">
-          <button
-            id="victims"
-            type="button"
-            onclick="changeViewNewData('victims')"
-            class="btn btn-secondary btn-sm"
-            data-bs-toggle="button"
-            aria-pressed="true"
-          >
-            Victims
-          </button>
-        </div>
-        <div class="col-md-auto">
-          <button
-            id="offenders"
-            type="button"
-            onclick="changeViewNewData('offenders')"
-            class="btn btn-secondary btn-sm"
-            data-bs-toggle="button"
-            aria-pressed="true"
-          >
-            Offenders
-          </button>
-        </div>
-        <div class="col-md-auto">
-          <button
-            id="offenses"
-            type="button"
-            onclick="changeViewNewData('offenses')"
-            class="btn btn-secondary btn-sm"
-            data-bs-toggle="button"
-            aria-pressed="true"
-          >
-            Offenses
-          </button>
-        </div>
-        <div class="col-md-auto">
-          <button
-            id="incidents"
-            type="button"
-            onclick="changeViewNewData('incidents')"
-            class="btn btn-secondary btn-sm"
-            data-bs-toggle="button"
-            aria-pressed="true"
-          >
-            Incidents
-          </button>
-        </div>
+      <div class="idiom" id="lineChart">
+        <h6><b>Evolution Of Single Bias Hate Crimes</b></h6>
+        <svg>
+          <img src="information.png" />
+          <div class="infoBox">
+            <p><b>Single Bias Hate Crime Evolution</b></p>
+            <p>
+              This shows the evolution of the total number of offenses,
+              incidents, victims or offenders
+            </p>
+          </div>
+        </svg>
       </div>
-      <div class="row" style="margin-top: 10px;">
-        <div id="barChart">
+      <div id="mainButtons" class="idiom">
+        <button
+          id="victims"
+          type="button"
+          onclick="changeViewNewData('victims')"
+          class="btn btn-secondary btn-sm"
+          data-bs-toggle="button"
+          aria-pressed="true"
+        >
+          Victims
+        </button>
+        <button
+          id="offenders"
+          type="button"
+          onclick="changeViewNewData('offenders')"
+          class="btn btn-secondary btn-sm"
+          data-bs-toggle="button"
+          aria-pressed="true"
+        >
+          Offenders
+        </button>
+        <button
+          id="offenses"
+          type="button"
+          onclick="changeViewNewData('offenses')"
+          class="btn btn-secondary btn-sm"
+          data-bs-toggle="button"
+          aria-pressed="true"
+        >
+          Offenses
+        </button>
+
+        <button
+          id="incidents"
+          type="button"
+          onclick="changeViewNewData('incidents')"
+          class="btn btn-secondary btn-sm"
+          data-bs-toggle="button"
+          aria-pressed="true"
+        >
+          Incidents
+        </button>
+      </div>
+
+      <div class="idiom" id="barChart">
+        <h6><b>Single Bias Hate Crimes by Bias Type</b></h6>
+        <svg>
+          <img src="information.png" />
+          <div class="infoBox">
+            <p><b>Single Bias Hate Crimes by Bias Type</b></p>
+            <p></p>
+            <p>
+              Compares bias type by the total number of offenses, incidents,
+              victims or offenders
+            </p>
+          </div>
           <button
             hidden
             type="button"
@@ -107,6 +119,33 @@
           >
             Go back
           </button>
+        </svg>
+      </div>
+      <div class="idiom" id="lolipop">
+        <img src="information.png" />
+        <div class="infoBox">
+          <p><b>SKRRRRRR</b></p>
+          <p>
+            skrr skrr
+          </p>
+        </div>
+      </div>
+      <div class="idiom" id="radar">
+        <img src="information.png" />
+        <div class="infoBox">
+          <p><b>SKRRRRRR</b></p>
+          <p>
+            skrr skrr
+          </p>
+        </div>
+      </div>
+      <div class="idiom" id="map">
+        <img src="information.png" />
+        <div class="infoBox">
+          <p><b>SKRRRRRR</b></p>
+          <p>
+            skrr skrr
+          </p>
         </div>
       </div>
     </div>

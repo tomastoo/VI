@@ -19,7 +19,22 @@ var tooltip;
 var topology;
 var currentFilter;
 var lastClickedYear = 2019;
-var selectedYears = [2005, 2006, 2007, 2008, 2009, 2010, 2011, 2013, 2014, 2015, 2016, 2017, 2018, 2019];
+var selectedYears = [
+  2005,
+  2006,
+  2007,
+  2008,
+  2009,
+  2010,
+  2011,
+  2013,
+  2014,
+  2015,
+  2016,
+  2017,
+  2018,
+  2019,
+];
 
 var getBallsX;
 
@@ -27,14 +42,11 @@ Promise.all([d3.json(map), d3.csv(table_1_offenses_src)]).then(function ([
   map,
   table_1_offenses_,
 ]) {
-  //////console.log(typeof table_1_offenses_);
+  prepareInfoButtons();
+
   table_1_offenses = table_1_offenses_;
-  // table_1_offenses = Object.assign({}, table_1_offenses_);
 
   topology = map;
-  //////console.log(table_1_offenses);
-  //////console.log(map);
-  //trableReformatYearsSingleBias(table_11_offenses[1]);
   tooltip = d3
     .select("body")
     .append("div")
@@ -46,30 +58,30 @@ Promise.all([d3.json(map), d3.csv(table_1_offenses_src)]).then(function ([
 
   createBarChart(table_1_offenses, false, selectedYears, "CATEGORY");
   currentFilter = "offenses";
-  handleLineChartClick(null, "2019");
 });
 
-/*************    CREATE LINE CHART   *************/
+function prepareInfoButtons() {
+  console.log("isto esta a ser chamado");
+  var a = d3.selectAll(".infoBox");
+  console.log(a);
+  d3.selectAll(".infoBox")
+    .style("display", "none")
+    .on("mouseover", function () {
+      d3.select(this).style("display", null);
+    })
+    .on("mouseleave", function () {
+      d3.select(this).style("display", "none");
+    });
 
-/*This function converts a line from table with format |2005,..2019, singleBias|
-to |singleBias, years|*/
-function trableReformatYearsSingleBias(data) {
-  //////console.log(data);
-  out = [];
-  for (const [key, value] of Object.entries(data)) {
-    if (key != "Bias motivation" && key != "YEAROW") {
-      out.push({ year: key, total: value });
-    }
-  }
-  // var max = d3.max(out, (d) => d.total);
-  //
-  // for (var i = 0; i < out.length; i++) {
-  //   out[i]["norm"] = out[i].total / max;
-  // }
-  //////console.log(out);
-  return out;
+  d3.selectAll(".idiom img")
+    .on("mouseover", function () {
+      d3.select(this.parentNode).select(".infoBox").style("display", null);
+    })
+    .on("mouseleave", function () {
+      d3.select(this.parentNode).select(".infoBox").style("display", "none");
+    });
 }
-
+/***************************BUTTONS HANDLING AREA (VICTIMS, OFFENDERS, OFFENSES, INCIDENTS) **************************************/
 function changeViewNewData(button) {
   switch (button) {
     case "victims":
@@ -164,8 +176,8 @@ function trableReformatYearsSingleBias(data) {
 }
 
 function createLineChart(table_11, update) {
-  const width = 1450;
-  const height = 150;
+  const width = 1430;
+  const height = 130;
   margin = { top: 10, right: 15, bottom: 20, left: 35 };
 
   data = trableReformatYearsSingleBias(table_11[1]);
@@ -218,12 +230,12 @@ function createLineChart(table_11, update) {
   if (!update) {
     var line = d3
       .select("div#lineChart")
-      .append("svg")
+      .select("svg")
+      //.attr("viewbox", "0 0 " + width + " " + height)
       .append("g")
       .attr("class", "line")
       .attr("fill", "steelblue")
       .attr("clip-path", "url(#clip)");
-    //      .append("path");
   }
 
   const svg = d3
@@ -318,7 +330,6 @@ function handleLineChartSelection(event, d) {
     .select("g.line")
     .selectAll("circle")
     .filter(function (c) {
-
       var cx = getBallsX(c.year);
 
       if (cx >= selection[0] && cx <= selection[1]) {
@@ -471,11 +482,9 @@ function parseDataTable(data, years) {
       for (let i = 0; i < years.length; i++) {
         if (kkey == years[i]) {
           out_value += parseInt(vvalue);
-        }
-        else if (kkey == "YEAROW") {
+        } else if (kkey == "YEAROW") {
           domain_type = vvalue;
-        }
-        else if (kkey == "Bias motivation") {
+        } else if (kkey == "Bias motivation") {
           bias_type = vvalue;
         }
       }
@@ -503,7 +512,7 @@ function createBarChart(data, update, years, category) {
   height = 200;
   width = 600;
 
-  margin = { top: 20, right: 30, bottom: 20, left: 35 };
+  margin = { top: 8, right: 30, bottom: 20, left: 35 };
 
   //console.log(years);
 
@@ -564,7 +573,7 @@ function createBarChart(data, update, years, category) {
 
   if (!update) {
     d3.select("div#barChart")
-      .append("svg")
+      .select("svg")
       .append("g")
       .attr("class", "bars")
       .attr("fill", "steelblue");
