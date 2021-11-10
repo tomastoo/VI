@@ -61,9 +61,9 @@ Promise.all([d3.json(map), d3.csv(table_1_offenses_src)]).then(function ([
 });
 
 function prepareInfoButtons() {
-  console.log("isto esta a ser chamado");
+  ////console.log("isto esta a ser chamado");
   var a = d3.selectAll(".infoBox");
-  console.log(a);
+  ////console.log(a);
   d3.selectAll(".infoBox")
     .style("display", "none")
     .on("mouseover", function () {
@@ -159,7 +159,7 @@ function unselectAllButtons() {
 /*This function converts a line from table with format |2005,..2019, singleBias|
 to |singleBias, years|*/
 function trableReformatYearsSingleBias(data) {
-  //////console.log(data);
+  //////////console.log(data);
   out = [];
   for (const [key, value] of Object.entries(data)) {
     if (key != "Bias motivation" && key != "YEAROW") {
@@ -171,7 +171,7 @@ function trableReformatYearsSingleBias(data) {
   // for (var i = 0; i < out.length; i++) {
   //   out[i]["norm"] = out[i].total / max;
   // }
-  //////console.log(out);
+  //////////console.log(out);
   return out;
 }
 
@@ -217,14 +217,14 @@ function createLineChart(table_11, update) {
   }
 
   function yAxis(g) {
-    g.attr("transform", `translate(${margin.left}, 0)`)
+    g.attr("transform", `translate(${margin.left + 13}, 0)`)
       .call(
         d3
           .axisLeft(y)
           .tickFormat((i) => Math.round(i * max))
           .ticks(5)
       )
-      .call((g) => g.select(".domain").remove());
+      ;
   }
 
   if (!update) {
@@ -272,7 +272,28 @@ function createLineChart(table_11, update) {
   }
 
   svg.select("g.lineXAxis").call(xAxis);
+  svg.select("g.lineXAxis")
+  .append("text")
+  .attr("y", height - 90)    
+  .attr("x", width - 700)
+  .attr("text-anchor", "end")
+  .attr("fill", "black")
+  .attr("font-size", "12")
+  .text("Year");
+
   svg.select("g.lineYAxis").call(yAxis);
+
+  svg.select("g.lineYAxis")
+      .append("text")
+      .attr("transform", "rotate(-90)")
+      //.attr("y", 10)
+      //.attr("x", 10)
+      //.attr("dy", "-5.1em")
+      .attr("y", width - 1465)
+      .attr("text-anchor", "end")
+      .attr("fill", "black")
+      .attr("font-size", "12")
+      .text("Number of crimes");
 
   d3.select(".lineXAxis").selectAll(".tick").on("click", handleLineChartClick);
   d3.select(".lineXAxis").attr("font-size", 13);
@@ -346,9 +367,6 @@ function handleLineChartSelection(event, d) {
 }
 
 function handleLineChartClick(event, d) {
-  //////console.log(selectedYears.length);
-  //////console.log(typeof selectedYears.length);
-  //  ////console.log(selectedYears);
 
   //  Primeiro vou filtrar todas as selections
 
@@ -362,23 +380,23 @@ function handleLineChartClick(event, d) {
   if (typeof [] === typeof d) {
     if (d.year != null) {
       if (selectedYears.indexOf(d.year) == -1) selectedYears.push(d.year);
-      //////console.log("circle click");
+      //////////console.log("circle click");
     } else {
-      ////console.log(selectedYears);
-      ////console.log("selectedYears.length = " + selectedYears.length);
+      ////////console.log(selectedYears);
+      ////////console.log("selectedYears.length = " + selectedYears.length);
       for (let i = 0; i < selectedYears.length; i++) {
-        ////console.log(i);
-        ////console.log(selectedYears[i]);
+        ////////console.log(i);
+        //////console.log(selectedYears[i]);
         clearLineChartSelections(selectedYears[i]);
         //after a splice if you continue the iteration i-- is necessary other wise
         // mayem will happen on deselecting years DO NOT DELETE THIS
         i--;
       }
       selectedYears = d;
-      ////console.log("array selection");
+      ////////console.log("array selection");
     }
   } else {
-    ////console.log("text click");
+    ////////console.log("text click");
     d = parseInt(d);
     if (selectedYears.indexOf(d) == -1) selectedYears.push(d);
   }
@@ -387,7 +405,7 @@ function handleLineChartClick(event, d) {
     lineChart
       .selectAll("circle")
       .filter(function (c) {
-        //////console.log(c);
+        //////////console.log(c);
         if (clickedYear == c.year || clickedYear == c) {
           return c;
         }
@@ -397,16 +415,18 @@ function handleLineChartClick(event, d) {
     lineChartXaxis
       .selectAll("text")
       .filter(function (c) {
-        //////console.log(c);
-        if (clickedYear == c.year || clickedYear == c) {
-          return c;
+        //console.log("c ", c);
+        if (c != undefined) {
+          if (clickedYear == c.year || clickedYear == c) {
+            return c;
+          }
         }
       })
       .attr("class", "text-danger")
       .style("font-weight", "bold");
   });
   var clickedYear = 2019;
-  //////console.log(table_1_offenses);
+  //////////console.log(table_1_offenses);
   switch (currentFilter) {
     case "offenses":
       Promise.all([d3.csv(table_1_offenses_src)]).then(function ([
@@ -444,6 +464,7 @@ function handleLineChartClick(event, d) {
 }
 
 function clearLineChartSelections(year) {
+ 
   selectedYears.splice(selectedYears.indexOf(year), 1);
   // isto esta aqui porque a linha acima nao apaga para arrays com um so elemento
   lineChart
@@ -459,8 +480,13 @@ function clearLineChartSelections(year) {
   lineChartXaxis
     .selectAll("text")
     .filter(function (c) {
-      if (year == c.year || year == c) {
-        return c;
+      //////console.log("c", c);
+      ////console.log("year", year);
+      
+      if (c != undefined) {
+        if ((year == c.year || year == c)) {
+          return c;
+        }
       }
     })
     .attr("class", "text-dark")
@@ -513,8 +539,6 @@ function createBarChart(data, update, years, category) {
   width = 600;
 
   margin = { top: 8, right: 30, bottom: 20, left: 35 };
-
-  //console.log(years);
 
   var dict_lines = parseDataTable(data, years);
 
@@ -669,12 +693,12 @@ function createBarChart(data, update, years, category) {
   svg.select("g.yAxis").call(yAxis)
       .append("text")
       .attr("transform", "rotate(-90)")
-      .attr("y", 10)
+      .attr("y", 15)
       .attr("dy", "-5.1em")
       .attr("text-anchor", "end")
       .attr("fill", "black")
-      .attr("font-size", "11")
-      .text("Stock Price");
+      .attr("font-size", "12")
+      .text("Number of crimes");
   
   d3.select(".xAxis").selectAll(".tick").on("click", function (event, d) {
     handleBarClick(d, data);
