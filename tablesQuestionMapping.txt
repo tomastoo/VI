@@ -1,0 +1,41 @@
+	
+TABLES 2019 
+	table 1 - Incidents, Offenses, Victims, and Known Offenders by Bias Motivation
+	table 2 - Incidents, Offenses, Victims, and Known Offenders by Offense Type 
+	table 3 - Known Offender's Race and Ethnicity by Offense Type
+ 	table 4 - Offences - Offense Type by Bias Motivation 
+	table 5 - Known Offender's Race and Ethnicity by Bias Motivation 
+	table 6 - Victim Type by Offense Type 
+	table 7 - Victims - Offense Type by Bias Motivation 
+	table 8 - Victim Type by Bias Motivation 
+	table 9 - Known Offender's Race, Ethnicity, and Age 
+	table 10 - Bias Motivation by Location
+	table 11 - Offense Type by Participating State and Federal
+	table 12 - Agency Hate Crime Reporting by State and Federal
+  	
+
+What are the most common single-bias hate crimes;
+	table 1 - Incidents, Offenses, Victims, and Known Offenders by Bias Motivation
+	
+
+How single bias hate crimes have evolved throughout the years;
+	table 1 -> 2005 2019	
+
+What are the most common offence types and categories in hate crimes;
+	table 4 - Offences - Offense Type by Bias Motivation
+	table 6 - Victim Type by Offense Type 
+	table 7 - Victims - Offense Type by Bias Motivation 
+ 	table 2 - Incidents, Offenses, Victims, and Known Offenders by Offense Type  
+
+What are the most common races/ethnicity and age of the offenders;
+	table 9 - Known Offender's Race, Ethnicity, and Age 
+	table 3 - Known Offender's Race and Ethnicity by Offense Type
+	table 5 - Known Offender's Race and Ethnicity by Bias Motivation 
+
+In what jurisdiction is each single bias hate crime most common;
+	table 11 - Offense Type by Participating State and Federal
+	table 10 - Bias Motivation by Location
+	table 12 - Agency Hate Crime Reporting by State and Federal
+	
+	
+	

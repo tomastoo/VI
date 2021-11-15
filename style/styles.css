@@ -2,22 +2,184 @@ div {
   width: 100%;
   float: left;
 }
-div.tooltip {	
-  position: absolute;			
-  text-align: center;			
-  width: 70px;					
-  height: 25px;					
-  padding: 2px;				
-  font: 12px sans-serif;		
-  background: lightsteelblue;	
-  border: 0px;		
-  border-radius: 8px;			
+div.tooltip {
+  position: absolute;
+  text-align: center;
+  width: 125px;
+  height: 50px;
+  padding: 2px;
+  font: 12px sans-serif;
+  background: lightsteelblue;
+  border: 0px;
+  border-radius: 8px;
 }
 
 #magicButton {
   position: absolute;
-  left: 550px;
-  top: 220px;
+  left: 540px;
+  top: 70px;
 }
 
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
+.btn {
+  margin-left: 20px;
+  margin-right: 20px;
+}
+
+#years {
+  background-color: red;
+}
+
+#months {
+  background-color: purple;
+}
+
+body {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+h1 {
+  font-size: 2.7em;
+  font-family: "Arial Black", Gadget, sans-serif;
+  font-weight: bolder;
+
+  color: #f77738;
+}
+h2 {
+  font-size: 2.7em;
+  font-family: "Arial Black", Gadget, sans-serif;
+  font-weight: bolder;
+  text-align: center;
+
+  color: #dc3545;
+}
+
+h6 {
+  font-size: 2.7em;
+  font-family: "Arial Black", Gadget, sans-serif;
+  font-weight: bolder;
+  text-align: center;
+  position: relative;
+  top: 10px;
+  color: "black";
+}
+
+p {
+  font-family: arial;
+}
+
+.infoBox {
+  position: absolute;
+  top: 23px;
+  right: 23px;
+  max-width: 300px;
+  z-index: 1;
+  background-color: #282c42;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.infoBox p {
+  color: white;
+  margin: 10px;
+}
+
+.idiom {
+  max-height: 97%;
+  max-width: 98.5%;
+  overflow: hidden;
+  position: relative;
+  background-color: #e2e3e3;
+  border-radius: 8px;
+  /* margin: 5px; */
+}
+
+.idiom img {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 20px;
+}
+
+.idiom svg {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+#year-slider {
+  background-color: #282c42;
+  border-radius: 0;
+}
+
+#title-card {
+  background-color: #282c42;
+  padding: 20px;
+}
+
+#title-card p {
+  font-size: 1.2em;
+  margin-top: 20%;
+  color: white;
+}
+
+#title-card a {
+  color: white;
+}
+
+#vis {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-columns: repeat(20, 1fr);
+  grid-template-rows: 0.2fr 0.7fr 1fr 1fr;
+  background-color: #c4c6c8;
+}
+/*grid area: rid-row-start / grid-column-start / grid-row-end / grid-column-end.*/
+/*margin: top right bottom left*/
+#lineChart {
+  width: 100%;
+  height: 100%;
+  grid-area: 2/1/2/21;
+  margin: 0px 0px 0px 8px;
+}
+
+#barChart {
+  grid-area: 3/1/3/11;
+  margin: 0px 0px 0px 5px;
+}
+
+#lolipop {
+  grid-area: 4/1/4/11;
+  margin: 0px 0px 0px 5px;
+}
+
+#map {
+  grid-area: 3/11/3/21;
+  margin: 0px 5px 0px 5px;
+}
+
+#radar {
+  grid-area: 4/11/4/21;
+  margin: 0px 0px 0px 5px;
+}
+
+#mainButtons {
+  grid-area: 1/11/1/21;
+  /* margin: 5px 5px 0px 5px; */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#title {
+  grid-area: 1/1/1/11;
+  /* margin: 5px 5px 0px 5px; */
+}
