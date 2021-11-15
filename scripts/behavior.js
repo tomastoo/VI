@@ -200,7 +200,6 @@ function createLineChart(table_11, update) {
     )
     .range([50, width - margin.right]);
 
-
   getBallsX = x;
 
   y = d3
@@ -217,14 +216,12 @@ function createLineChart(table_11, update) {
   }
 
   function yAxis(g) {
-    g.attr("transform", `translate(${margin.left + 13}, 0)`)
-      .call(
-        d3
-          .axisLeft(y)
-          .tickFormat((i) => Math.round(i * max))
-          .ticks(5)
-      )
-      ;
+    g.attr("transform", `translate(${margin.left + 13}, 0)`).call(
+      d3
+        .axisLeft(y)
+        .tickFormat((i) => Math.round(i * max))
+        .ticks(5)
+    );
   }
 
   if (!update) {
@@ -272,28 +269,30 @@ function createLineChart(table_11, update) {
   }
 
   svg.select("g.lineXAxis").call(xAxis);
-  svg.select("g.lineXAxis")
-  .append("text")
-  .attr("y", height - 90)    
-  .attr("x", width - 700)
-  .attr("text-anchor", "end")
-  .attr("fill", "black")
-  .attr("font-size", "12")
-  .text("Year");
+  svg
+    .select("g.lineXAxis")
+    .append("text")
+    .attr("y", height - 90)
+    .attr("x", width - 700)
+    .attr("text-anchor", "end")
+    .attr("fill", "black")
+    .attr("font-size", "12")
+    .text("Year");
 
   svg.select("g.lineYAxis").call(yAxis);
 
-  svg.select("g.lineYAxis")
-      .append("text")
-      .attr("transform", "rotate(-90)")
-      //.attr("y", 10)
-      //.attr("x", 10)
-      //.attr("dy", "-5.1em")
-      .attr("y", width - 1465)
-      .attr("text-anchor", "end")
-      .attr("fill", "black")
-      .attr("font-size", "12")
-      .text("Number of crimes");
+  svg
+    .select("g.lineYAxis")
+    .append("text")
+    .attr("transform", "rotate(-90)")
+    //.attr("y", 10)
+    //.attr("x", 10)
+    //.attr("dy", "-5.1em")
+    .attr("y", width - 1465)
+    .attr("text-anchor", "end")
+    .attr("fill", "black")
+    .attr("font-size", "12")
+    .text("Number of crimes");
 
   d3.select(".lineXAxis").selectAll(".tick").on("click", handleLineChartClick);
   d3.select(".lineXAxis").attr("font-size", 13);
@@ -324,7 +323,7 @@ function createLineChart(table_11, update) {
             .attr("cy", (d) => y(d.total / max))
             .attr("r", 5)
             .on("click", handleLineChartClick)
-            .on("mouseover", handleMouseHoverLineChart)
+            //.on("mouseover", handleMouseHoverLineChart)
             .on("mouseleave", handleMouseLeave)
         );
       },
@@ -367,7 +366,6 @@ function handleLineChartSelection(event, d) {
 }
 
 function handleLineChartClick(event, d) {
-
   //  Primeiro vou filtrar todas as selections
 
   // vou chamar o desenho do linechart tal e o eixo dos x porque quero
@@ -464,7 +462,6 @@ function handleLineChartClick(event, d) {
 }
 
 function clearLineChartSelections(year) {
- 
   selectedYears.splice(selectedYears.indexOf(year), 1);
   // isto esta aqui porque a linha acima nao apaga para arrays com um so elemento
   lineChart
@@ -482,9 +479,9 @@ function clearLineChartSelections(year) {
     .filter(function (c) {
       //////console.log("c", c);
       ////console.log("year", year);
-      
+
       if (c != undefined) {
-        if ((year == c.year || year == c)) {
+        if (year == c.year || year == c) {
           return c;
         }
       }
@@ -496,13 +493,11 @@ function clearLineChartSelections(year) {
 /***********************************************************************************/
 
 function parseDataTable(data, years) {
-
   var out = [];
   var out_value = 0;
   var bias_type;
   var domain_type;
   for (const [key, value] of Object.entries(data)) {
-
     out_value = 0;
     for (const [kkey, vvalue] of Object.entries(value)) {
       for (let i = 0; i < years.length; i++) {
@@ -521,17 +516,13 @@ function parseDataTable(data, years) {
 }
 
 function barTranslateFunction(ticks, x) {
-
   if (ticks == 8 || ticks == 7) {
-      return x.bandwidth() / ticks + 20;
-  }
-  else if (ticks == 2) {
+    return x.bandwidth() / ticks + 20;
+  } else if (ticks == 2) {
     return x.bandwidth() / ticks - 5;
-  }
-  else {
+  } else {
     return x.bandwidth() / ticks + 25;
   }
-  
 }
 
 function createBarChart(data, update, years, category) {
@@ -641,7 +632,10 @@ function createBarChart(data, update, years, category) {
             return color(i);
           })
           .style("opacity", 0.8)
-          .attr("transform", "translate("+ barTranslateFunction(ticks, x) +",0)")
+          .attr(
+            "transform",
+            "translate(" + barTranslateFunction(ticks, x) + ",0)"
+          )
           .on("mouseover", handleMouseHover)
           .on("mouseleave", handleMouseLeave)
           .on("click", function (event, d) {
@@ -665,7 +659,10 @@ function createBarChart(data, update, years, category) {
             return color(i);
           })
           .style("opacity", 0.8)
-          .attr("transform", "translate("+ barTranslateFunction(ticks, x) +",0)")
+          .attr(
+            "transform",
+            "translate(" + barTranslateFunction(ticks, x) + ",0)"
+          )
           .on("mouseover", handleMouseHover)
           .on("mouseleave", handleMouseLeave);
       },
@@ -683,31 +680,34 @@ function createBarChart(data, update, years, category) {
     .select("g.xAxis")
     .call(xAxis)
     .append("text")
-    .attr("y", height - 165)    
+    .attr("y", height - 165)
     .attr("x", width - 250)
     .attr("text-anchor", "end")
     .attr("fill", "black")
     .attr("font-size", "12")
     .text("Bias motivation");
 
-  svg.select("g.yAxis").call(yAxis)
-      .append("text")
-      .attr("transform", "rotate(-90)")
-      .attr("y", 15)
-      .attr("dy", "-5.1em")
-      .attr("text-anchor", "end")
-      .attr("fill", "black")
-      .attr("font-size", "12")
-      .text("Number of crimes");
-  
-  d3.select(".xAxis").selectAll(".tick").on("click", function (event, d) {
-    handleBarClick(d, data);
-  });
+  svg
+    .select("g.yAxis")
+    .call(yAxis)
+    .append("text")
+    .attr("transform", "rotate(-90)")
+    .attr("y", 15)
+    .attr("dy", "-5.1em")
+    .attr("text-anchor", "end")
+    .attr("fill", "black")
+    .attr("font-size", "12")
+    .text("Number of crimes");
+
+  d3.select(".xAxis")
+    .selectAll(".tick")
+    .on("click", function (event, d) {
+      handleBarClick(d, data);
+    });
   d3.select(".xAxis").attr("font-size", 11);
 }
 
 function handleBarClick(d, dataset) {
-
   var bias_type;
   tooltip.transition().duration(400).style("opacity", 0);
 
