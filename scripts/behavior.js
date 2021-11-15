@@ -2,13 +2,15 @@ var table_1_incidents_src = "data/table1-Incidentes.csv";
 var table_1_offenses_src = "data/table1-Offenses.csv";
 var table_1_victims_src = "data/table1-Victims.csv";
 var table_1_offenders_src = "data/table1-Known Offender.csv";
+var table_12_combination_scr = "data/table12-combination.csv";
 
 var table_1_incidents;
 var table_1_offenses;
 var table_1_victims;
 var table_1_offenders;
+var table_12_combination;
 
-var map = "data/countries-110m.json";
+var map = "data/states-albers-10m.json";
 
 var tooltip;
 var topology;
@@ -72,6 +74,8 @@ Promise.all([d3.json(map), d3.csv(table_1_offenses_src)]).then(function ([
       600
     );
   }
+
+  createUSMap(data);
 
   currentFilter = "offenses";
   handleLineChartClick(null, "2019");
@@ -1037,4 +1041,45 @@ function getMin(data) {
     }
   }
   return min;
+}
+
+
+function createUSMap(data){
+
+
+  var path = d3.geoPath()
+
+  d3.select("#usMap")
+  .append("svg")
+  .attr("viewBox", [0, 0, 975, 610])
+  //.attr("height", height)
+  //.attr("width", width)
+  .selectAll("path")
+  .data(topojson.feature(topology, topology.objects.states).features)
+  .join("path")
+  .attr("class", "state")
+  .attr("d", path)
+  .attr("fill", "gray")
+  .style("stroke", "black")
+  .style("stroke-width", 1)
+  .attr("stroke-linejoin", "round")
+  .attr("pointer-events", "none")
+  .attr("id", function (d, i) {
+    console.log(d.properties.name)
+    return d.properties.name;
+  })
+  .append("title")
+  .text(function (d) {
+    return d.properties.name;
+  });
+
+}
+
+function updateMap() {
+  majorDataset.forEach(function (d) {
+    d3.select("div#usMap")
+      .select("svg")
+      .select("path[id='" + d.states + "']")
+      .style("fill", d3.interpolateBlues(d.));
+  });
 }
