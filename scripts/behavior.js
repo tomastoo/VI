@@ -3,7 +3,7 @@ var table_1_offenses_src = "data/table1-Offenses.csv";
 var table_1_victims_src = "data/table1-Victims.csv";
 var table_1_offenders_src = "data/table1-Known Offender.csv";
 var table_12_combination_scr = "data/table12-combination.csv";
-var table_11_combination_scr ="data/table11-combination.csv";
+var table_11_combination_scr = "data/table11-combination.csv";
 
 var table_1_incidents;
 var table_1_offenses;
@@ -19,7 +19,7 @@ var map = "data/states-albers-10m.json";
 var ballColor = "#dc3545";
 var selectedBallColor = "black";
 var lineColor = "red";
-
+var selectedStates = [];
 var tooltip;
 var tooltip2;
 var topology;
@@ -45,17 +45,16 @@ var selectedYears = [
 var getBallsX;
 var lineMax = 10;
 
-
-
-Promise.all([d3.json(map), d3.csv(table_1_offenses_src), d3.csv(table_11_combination_scr)]).then(function ([
-  map,
-  table_1_offenses_,table_11_combination_
-]) {
+Promise.all([
+  d3.json(map),
+  d3.csv(table_1_offenses_src),
+  d3.csv(table_11_combination_scr),
+]).then(function ([map, table_1_offenses_, table_11_combination_]) {
   prepareInfoButtons();
 
   table_1_offenses = table_1_offenses_;
   table_11_combination = table_11_combination_;
-  
+
   topology = map;
   tooltip = d3
     .select("body")
@@ -63,25 +62,23 @@ Promise.all([d3.json(map), d3.csv(table_1_offenses_src), d3.csv(table_11_combina
     .attr("class", "tooltip")
     .style("opacity", 0);
 
-  //for tooltip 
-  
-  tooltip2 = d3.select("body")
+  //for tooltip
+
+  tooltip2 = d3
+    .select("body")
     .append("div")
     .attr("class", "tooltip")
     .style("opacity", 0);
 
-    
   currentFilter = "offenses";
-  createLineChart(table_11_combination, false);
+  createLineChart(table_1_offenses, false);
   changeViewNewData("offenses");
 
   createBarChart(table_1_offenses, false, selectedYears, "CATEGORY");
-  
 
   lastMap = "offenses";
   createUSMap(table_11_combination, false, selectedYears);
   addZoom();
-  
 });
 
 function prepareInfoButtons() {
@@ -118,8 +115,6 @@ function changeViewNewData(button) {
         currentFilter = "victims";
         createLineChart(table_1_victims, true);
         createBarChart(table_1_victims, true, selectedYears, "CATEGORY");
-
-        
       });
       break;
     case "offenders":
@@ -132,41 +127,41 @@ function changeViewNewData(button) {
         currentFilter = "offenders";
         createLineChart(table_1_offenders, true);
         createBarChart(table_1_offenders, true, selectedYears, "CATEGORY");
-        
       });
       break;
 
     case "offenses":
-      Promise.all([d3.csv(table_1_offenses_src),d3.csv(table_11_combination_scr)]).then(function ([
-        table_1_offenses_, table_11_combination_
-      ]) {
+      Promise.all([
+        d3.csv(table_1_offenses_src),
+        d3.csv(table_11_combination_scr),
+      ]).then(function ([table_1_offenses_, table_11_combination_]) {
         table_1_offenses = table_1_offenses_;
         table_11_combination = table_11_combination_;
         unselectAllButtons();
         selectButton(button);
         currentFilter = "offenses";
-        createLineChart(table_11_combination, true);
+        createLineChart(table_1_offenses, true);
         createBarChart(table_1_offenses, true, selectedYears, "CATEGORY");
-        createUSMap(table_11_combination,true, selectedYears);
+        createUSMap(table_11_combination, true, selectedYears);
         lastMap = "offenses";
 
         currentFilter = "offenses";
       });
       break;
     case "incidents":
-      Promise.all([d3.csv(table_1_incidents_src), d3.csv(table_12_combination_scr)]).then(function ([
-        table_1_incidents_, table_12_combination_
-      ]) {
+      Promise.all([
+        d3.csv(table_1_incidents_src),
+        d3.csv(table_12_combination_scr),
+      ]).then(function ([table_1_incidents_, table_12_combination_]) {
         table_1_incidents = table_1_incidents_;
         table_12_combination = table_12_combination_;
         unselectAllButtons();
         selectButton(button);
         currentFilter = "incidents";
-        createLineChart(table_11_combination, true);
+        createLineChart(table_1_incidents, true);
         createBarChart(table_1_incidents, true, selectedYears, "CATEGORY");
-        createUSMap(table_12_combination,true, selectedYears);
+        createUSMap(table_12_combination, true, selectedYears);
         lastMap = "incidents";
-        
       });
       break;
     default:
@@ -215,7 +210,7 @@ function trableReformatYearsCombination(data) {
       out.push({ year: key, total: value });
     }
   }
-  
+
   return out;
 }
 
@@ -224,13 +219,7 @@ function createLineChart(table_11, update) {
   const height = 130;
   margin = { top: 10, right: 15, bottom: 20, left: 35 };
 
-  if (currentFilter == "offenses" || currentFilter == "incidents"){
-    data = trableReformatYearsCombination(table_11[0]);  
-  }
-  else{
-    data = trableReformatYearsSingleBias(table_11[0]);
-  }
-  console.log(data);
+  data = trableReformatYearsSingleBias(table_11[1]);
   var max = d3.max(data, (d) => d.total);
   line = d3
     .line()
@@ -238,7 +227,7 @@ function createLineChart(table_11, update) {
       return d.year;
     })
     .x((d) => x(d.year))
-    .y((d) => y(d.total / lineMax));
+    .y((d) => y(d.total / max));
 
   // the domain line with the extent will make the min value the lowest year to the max
   x = d3
@@ -249,7 +238,6 @@ function createLineChart(table_11, update) {
       })
     )
     .range([50, width - margin.right]);
-
 
   getBallsX = x;
 
@@ -267,14 +255,26 @@ function createLineChart(table_11, update) {
   }
 
   function yAxis(g) {
-    g.attr("transform", `translate(${margin.left + 13}, 0)`)
-      .call(
-        d3
-          .axisLeft(y)
-          .tickFormat((i) => Math.round(i * lineMax*10)/10)
-          .ticks(5)
-      )
-      ;
+    g.attr("transform", `translate(${margin.left + 13}, 0)`).call(
+      d3
+        .axisLeft(y)
+        .tickFormat((i) => Math.round(i * max))
+        .ticks(5)
+    );
+  }
+
+  yRight = d3
+    .scaleLinear()
+    .domain([0, lineMax])
+    .range([height - margin.bottom, margin.top]);
+
+  function yAxisRight(g) {
+    g.attr("transform", `translate(${width - margin.right + 8}, 0)`).call(
+      d3
+        .axisRight(yRight)
+        .tickFormat((i) => i)
+        .ticks(5)
+    );
   }
 
   if (!update) {
@@ -297,6 +297,7 @@ function createLineChart(table_11, update) {
   if (!update) {
     svg.append("g").attr("class", "lineXAxis");
     svg.append("g").attr("class", "lineYAxis");
+    svg.append("g").attr("class", "lineYAxisRight");
     var clip = svg
       .append("defs")
       .append("svg:clipPath")
@@ -322,40 +323,31 @@ function createLineChart(table_11, update) {
   }
 
   svg.select("g.lineXAxis").call(xAxis);
-  svg.select("g.lineXAxis")
-  .append("text")
-  .attr("y", height - 90)    
-  .attr("x", width - 700)
-  .attr("text-anchor", "end")
-  .attr("fill", "black")
-  .attr("font-size", "12")
-  .text("Year");
+  svg
+    .select("g.lineXAxis")
+    .append("text")
+    .attr("y", height - 90)
+    .attr("x", width - 700)
+    .attr("text-anchor", "end")
+    .attr("fill", "black")
+    .attr("font-size", "12")
+    .text("Year");
 
   svg.select("g.lineYAxis").call(yAxis);
-  if(!update){
-    svg.select("g.lineYAxis")
-      .append("text")
-      .attr("id","ff")
-      .attr("transform", "rotate(-90)")
-      //.attr("y", 10)
-      //.attr("x", 10)
-      //.attr("dy", "-5.1em")
-      .attr("y", width - 1465)
-      .attr("text-anchor", "end")
-      .attr("fill", "black")
-      .attr("font-size", "12");
-  }
-    svg.select("g.lineYAxis").select("text#ff")
-      .text(function(d){
-         if(currentFilter == "offenses" || currentFilter == "incidents"){
-          return "Crimes/Pop per 100000";
-        }
-        else{
-          return "Number of Crimes";
-        }
-        
-      }
-      );
+  svg.select("g.lineYAxisRight").call(yAxisRight);
+
+  svg
+    .select("g.lineYAxis")
+    .append("text")
+    .attr("transform", "rotate(-90)")
+    //.attr("y", 10)
+    //.attr("x", 10)
+    //.attr("dy", "-5.1em")
+    .attr("y", width - 1465)
+    .attr("text-anchor", "end")
+    .attr("fill", "black")
+    .attr("font-size", "12")
+    .text("Number of crimes");
 
   d3.select(".lineXAxis").selectAll(".tick").on("click", handleLineChartClick);
   d3.select(".lineXAxis").attr("font-size", 13);
@@ -383,17 +375,17 @@ function createLineChart(table_11, update) {
             .attr("fill", ballColor)
             // .attr("stroke-width", 1.5)
             .attr("cx", (d) => x(d.year))
-            .attr("cy", (d) => y(d.total / lineMax))
+            .attr("cy", (d) => y(d.total / max))
             .attr("r", 5)
             .on("click", handleLineChartClick)
-            .on("mouseover", handleMouseHoverLineChart)
+            //.on("mouseover", handleMouseHoverLineChart)
             .on("mouseleave", handleMouseLeave)
         );
       },
       (update) => {
         update
           .attr("cx", (d) => x(d.year))
-          .attr("cy", (d) => y(d.total / lineMax))
+          .attr("cy", (d) => y(d.total / max))
           .attr("r", 5);
       },
       (exit) => {
@@ -429,7 +421,6 @@ function handleLineChartSelection(event, d) {
 }
 
 function handleLineChartClick(event, d) {
-
   //  Primeiro vou filtrar todas as selections
 
   // vou chamar o desenho do linechart tal e o eixo dos x porque quero
@@ -491,45 +482,57 @@ function handleLineChartClick(event, d) {
   //////////console.log(table_1_offenses);
   switch (currentFilter) {
     case "offenses":
-      Promise.all([d3.csv(table_1_offenses_src), d3.csv(table_12_combination_scr), d3.csv(table_11_combination_scr)]).then(function ([
-        table_1_offenses, table_12_combination, table_11_combination
+      Promise.all([
+        d3.csv(table_1_offenses_src),
+        d3.csv(table_12_combination_scr),
+        d3.csv(table_11_combination_scr),
+      ]).then(function ([
+        table_1_offenses,
+        table_12_combination,
+        table_11_combination,
       ]) {
         createBarChart(table_1_offenses, true, selectedYears, "CATEGORY");
-        if(lastMap == "incidents"){
-          createUSMap(table_12_combination,true,selectedYears);
-        }
-        else{
-          createUSMap(table_11_combination,true,selectedYears);
+        if (lastMap == "incidents") {
+          createUSMap(table_12_combination, true, selectedYears);
+        } else {
+          createUSMap(table_11_combination, true, selectedYears);
         }
       });
       break;
     case "victims":
-      Promise.all([d3.csv(table_1_victims_src), d3.csv(table_12_combination_scr), d3.csv(table_11_combination_scr)]).then(function ([
-        table_1_victims, table_12_combination, table_11_combination
+      Promise.all([
+        d3.csv(table_1_victims_src),
+        d3.csv(table_12_combination_scr),
+        d3.csv(table_11_combination_scr),
+      ]).then(function ([
+        table_1_victims,
+        table_12_combination,
+        table_11_combination,
       ]) {
         createBarChart(table_1_victims, true, selectedYears, "CATEGORY");
-        if(lastMap == "incidents"){
-          createUSMap(table_12_combination,true,selectedYears);
-        }
-        else{
-          createUSMap(table_11_combination,true,selectedYears);
+        if (lastMap == "incidents") {
+          createUSMap(table_12_combination, true, selectedYears);
+        } else {
+          createUSMap(table_11_combination, true, selectedYears);
         }
       });
       break;
     case "offenders":
-      Promise.all([d3.csv(table_1_offenders_src), d3.csv(table_11_combination_scr)]).then(function ([
-        table_1_offenders, table_11_combination
-      ]) {
+      Promise.all([
+        d3.csv(table_1_offenders_src),
+        d3.csv(table_11_combination_scr),
+      ]).then(function ([table_1_offenders, table_11_combination]) {
         createBarChart(table_1_offenders, true, selectedYears, "CATEGORY");
-        createUSMap(table_11_combination,true,selectedYears);
+        createUSMap(table_11_combination, true, selectedYears);
       });
       break;
     case "incidents":
-      Promise.all([d3.csv(table_1_incidents_src), d3.csv(table_12_combination_scr)]).then(function ([
-        table_1_incidents, table_12_combination
-      ]) {
+      Promise.all([
+        d3.csv(table_1_incidents_src),
+        d3.csv(table_12_combination_scr),
+      ]).then(function ([table_1_incidents, table_12_combination]) {
         createBarChart(table_1_incidents, true, selectedYears, "CATEGORY");
-        createUSMap(table_12_combination,true,selectedYears);
+        createUSMap(table_12_combination, true, selectedYears);
       });
       break;
     default:
@@ -540,7 +543,6 @@ function handleLineChartClick(event, d) {
 }
 
 function clearLineChartSelections(year) {
- 
   selectedYears.splice(selectedYears.indexOf(year), 1);
   // isto esta aqui porque a linha acima nao apaga para arrays com um so elemento
   lineChart
@@ -558,9 +560,9 @@ function clearLineChartSelections(year) {
     .filter(function (c) {
       //////console.log("c", c);
       ////console.log("year", year);
-      
+
       if (c != undefined) {
-        if ((year == c.year || year == c)) {
+        if (year == c.year || year == c) {
           return c;
         }
       }
@@ -572,13 +574,11 @@ function clearLineChartSelections(year) {
 /***********************************************************************************/
 
 function parseDataTable(data, years) {
-
   var out = [];
   var out_value = 0;
   var bias_type;
   var domain_type;
   for (const [key, value] of Object.entries(data)) {
-
     out_value = 0;
     for (const [kkey, vvalue] of Object.entries(value)) {
       for (let i = 0; i < years.length; i++) {
@@ -597,17 +597,13 @@ function parseDataTable(data, years) {
 }
 
 function barTranslateFunction(ticks, x) {
-
   if (ticks == 8 || ticks == 7) {
-      return x.bandwidth() / ticks + 20;
-  }
-  else if (ticks == 2) {
+    return x.bandwidth() / ticks + 20;
+  } else if (ticks == 2) {
     return x.bandwidth() / ticks - 5;
-  }
-  else {
+  } else {
     return x.bandwidth() / ticks + 25;
   }
-  
 }
 
 function createBarChart(data, update, years, category) {
@@ -717,7 +713,10 @@ function createBarChart(data, update, years, category) {
             return color(i);
           })
           .style("opacity", 0.8)
-          .attr("transform", "translate("+ barTranslateFunction(ticks, x) +",0)")
+          .attr(
+            "transform",
+            "translate(" + barTranslateFunction(ticks, x) + ",0)"
+          )
           .on("mouseover", handleMouseHover)
           .on("mouseleave", handleMouseLeave)
           .on("click", function (event, d) {
@@ -741,7 +740,10 @@ function createBarChart(data, update, years, category) {
             return color(i);
           })
           .style("opacity", 0.8)
-          .attr("transform", "translate("+ barTranslateFunction(ticks, x) +",0)")
+          .attr(
+            "transform",
+            "translate(" + barTranslateFunction(ticks, x) + ",0)"
+          )
           .on("mouseover", handleMouseHover)
           .on("mouseleave", handleMouseLeave);
       },
@@ -759,31 +761,34 @@ function createBarChart(data, update, years, category) {
     .select("g.xAxis")
     .call(xAxis)
     .append("text")
-    .attr("y", height - 165)    
+    .attr("y", height - 165)
     .attr("x", width - 250)
     .attr("text-anchor", "end")
     .attr("fill", "black")
     .attr("font-size", "12")
     .text("Bias motivation");
 
-  svg.select("g.yAxis").call(yAxis)
-      .append("text")
-      .attr("transform", "rotate(-90)")
-      .attr("y", 15)
-      .attr("dy", "-5.1em")
-      .attr("text-anchor", "end")
-      .attr("fill", "black")
-      .attr("font-size", "12")
-      .text("Number of crimes");
-  
-  d3.select(".xAxis").selectAll(".tick").on("click", function (event, d) {
-    handleBarClick(d, data);
-  });
+  svg
+    .select("g.yAxis")
+    .call(yAxis)
+    .append("text")
+    .attr("transform", "rotate(-90)")
+    .attr("y", 15)
+    .attr("dy", "-5.1em")
+    .attr("text-anchor", "end")
+    .attr("fill", "black")
+    .attr("font-size", "12")
+    .text("Number of crimes");
+
+  d3.select(".xAxis")
+    .selectAll(".tick")
+    .on("click", function (event, d) {
+      handleBarClick(d, data);
+    });
   d3.select(".xAxis").attr("font-size", 11);
 }
 
 function handleBarClick(d, dataset) {
-
   var bias_type;
   tooltip.transition().duration(400).style("opacity", 0);
 
@@ -926,51 +931,51 @@ function getMin(data) {
   return min;
 }
 
-
-function createUSMap(data, update, years){
+function createUSMap(data, update, years) {
   height = 200;
   width = 600;
-  var offsetL = document.getElementById('usMap').offsetLeft+10;
-  var offsetT = document.getElementById('usMap').offsetTop+10;
+  var offsetL = document.getElementById("usMap").offsetLeft + 10;
+  var offsetT = document.getElementById("usMap").offsetTop + 10;
 
-  var path = d3.geoPath()
+  var path = d3.geoPath();
 
- // var dict_lines = parseDataTable(data, [2005]);
-  
-  let svg = d3.select("div#usMap")
-  .select("svg")
-  //.attr("height", height)
-  //.attr("width", width)
-  .attr("viewBox", [0, 0, 975, 710]);
+  // var dict_lines = parseDataTable(data, [2005]);
 
-  if(!update){
+  let svg = d3
+    .select("div#usMap")
+    .select("svg")
+    //.attr("height", height)
+    //.attr("width", width)
+    .attr("viewBox", [0, 0, 975, 710]);
+
+  if (!update) {
     svg
-    .append("g")
-    .selectAll("path")
-    .data(topojson.feature(topology, topology.objects.states).features)
-    .join("path")
-    .attr("class", "state")
-    .attr("id", function (d, i) {
-      //console.log(d.properties.name)
-      return d.properties.name;
-    })
-    .attr("fill", "gray")
-    .attr("d", path)
-    .style("stroke", "black")
-    .style("stroke-width", 1)
-    //.attr("stroke-linejoin", "round")
-    //.attr("pointer-events", "none")
-    .on("mousemove", function (event, d) {
-      var dir_data = parseDataTableMap(data, years);  
-     // console.log(d.properties.name);
-      item = dir_data.filter(function (dataItem) {
-        if (dataItem.line == d.properties.name) return dataItem;
-      });  
-      //console.log(item);
-      //console.log(item[0].value);
-      
-      if(item != null){  
-        /*
+      .append("g")
+      .selectAll("path")
+      .data(topojson.feature(topology, topology.objects.states).features)
+      .join("path")
+      .attr("class", "state")
+      .attr("id", function (d, i) {
+        //console.log(d.properties.name)
+        return d.properties.name;
+      })
+      .attr("fill", "gray")
+      .attr("d", path)
+      .style("stroke", "black")
+      .style("stroke-width", 1)
+      //.attr("stroke-linejoin", "round")
+      //.attr("pointer-events", "none")
+      .on("mousemove", function (event, d) {
+        var dir_data = parseDataTableMap(data, years);
+        // console.log(d.properties.name);
+        item = dir_data.filter(function (dataItem) {
+          if (dataItem.line == d.properties.name) return dataItem;
+        });
+        //console.log(item);
+        //console.log(item[0].value);
+
+        if (item != null) {
+          /*
         var mouse = d3.pointer(event)
         .map( function(d) { return parseInt(d); } );
         tooltip.classed("hidden", false)
@@ -980,7 +985,7 @@ function createUSMap(data, update, years){
         "<br>" +
         "Value: " +
         item[0].value);*/
-       /* tooltip2.transition().duration(400).style("opacity", 0.9);
+          /* tooltip2.transition().duration(400).style("opacity", 0.9);
         tooltip2
           .html(
             "State: " +
@@ -988,70 +993,62 @@ function createUSMap(data, update, years){
               "<br>" +
               "Value: " +
               item[0].value
-              
+
           )
           .style("left", event.pageX + "px")
           .style("top", event.pageY - 28 + "px");*/
         }
-      if (!d3.select(this).classed("selected"))
-        d3.select(this).style("stroke-width", 2);
-    })
-    .on("click", function (event, d) {
-
-      d3.select(this).classed("selected", function (c, i) {
-        return !d3.select(this).classed("selected");
-      });
-      drawer_text = "";
-      drawer_list = [];
-      svg.selectAll(".selected").each(function (d, i) {
-        d3.select(this).style("stroke-width", 5);
-        drawer_list.push(d.properties.name);
-      });
-      drawer_list.sort();
-      drawer_list.forEach(function (e) {
-        drawer_text += "<li>";
-        drawer_text += e;
-        drawer_text += "</li>";
-      });
-      //d3.select("#drawer").html(drawer_text);
-      //add line to line chart
-      console.log(d);
-      item = data.filter(function (dataItem) {
-        if (dataItem.state == d.properties.name) return dataItem;
-      });  
-      
-      dat = trableReformatYearsCombination(item[0]);
-      console.log(dat);
-
-      line = d3
-      .line()
-      .defined(function (d) {
-        return d.year;
+        if (!d3.select(this).classed("selected"))
+          d3.select(this).style("stroke-width", 2);
       })
-      .x((d) => x(d.year))
-      .y((d) => y(d.total / lineMax));
-      
-      d3
-      .select("div#lineChart")
-      .select("svg")
-      .select("path")
-      .datum(dat)
-      .attr("fill", "none")
-      .attr("stroke", "blue")
-      .attr("stroke-width", 1.5)
-      .attr("d", line);
+      .on("click", function (event, d) {
+        d3.select(this).classed("selected", function (c, i) {
+          return !d3.select(this).classed("selected");
+        });
 
-      var dir_data = parseDataTableMap(data, years); 
-      updateMap(dir_data);
-    })
-    .on("mouseout",  function(d,i) {
-      tooltip2.classed("hidden", true);
-   })
+        console.log(d);
+        item = data.filter(function (dataItem) {
+          if (dataItem.state == d.properties.name) return dataItem;
+        });
+        drawer_text = "";
+
+        dat = trableReformatYearsCombination(item[0]);
+        console.log(dat);
+        console.log(selectedStates);
+        if (selectedStates.includes(d.properties.name)) {
+          removeStateLine(d.properties.name);
+          selectedStates.splice(selectedStates.indexOf(d.properties.name), 1);
+          console.log(selectedStates);
+        } else {
+          appendNewStateLine(dat, d.properties.name);
+          selectedStates.push(d.properties.name);
+          console.log(selectedStates);
+        }
+
+        svg.selectAll(".selected").each(function (d, i) {
+          d3.select(this).style("stroke-width", 5);
+          // selectedStates.push(d.properties.name);
+        });
+        selectedStates.sort();
+        selectedStates.forEach(function (e) {
+          drawer_text += "<li>";
+          drawer_text += e;
+          drawer_text += "</li>";
+        });
+        //d3.select("#drawer").html(drawer_text);
+        //add line to line chart
+
+        var dir_data = parseDataTableMap(data, years);
+        updateMap(dir_data);
+      })
+      .on("mouseout", function (d, i) {
+        tooltip2.classed("hidden", true);
+      });
     /*
     .on("mouseleave", function (d) {
       if (!d3.select(this).classed("selected"))
         d3.select(this).style("stroke-width", 1);
-    })*/;
+    })*/
   }
   var dir_data = parseDataTableMap(data, years);
   var max = getMax(dir_data);
@@ -1081,7 +1078,7 @@ function createUSMap(data, update, years){
   var c_r = d3.scaleSequential(l_domain, d3.interpolateReds);
   const n_r = Math.min(c_r.domain().length, c_r.range().length);
 
-  if(!update){
+  if (!update) {
     var grad = svg
       .append("defs")
       .append("linearGradient")
@@ -1100,57 +1097,50 @@ function createUSMap(data, update, years){
       .append("stop")
       .attr("offset", "100%")
       .style("stop-color", d3.interpolateReds(1));
-    
-    svg
-        .append("rect")
-        .attr("width", l_width)
-        .attr("height", l_height)
-        .style("fill", "transparent")
-        .style("stroke", "black")
-        .style("stroke-width", "1px")
-        .style("fill", "url('#grad1')")
-        .attr(
-          "transform",
-          `translate(${l_margin + l_height + l_spacing},${
-            height - l_margin
-          })rotate(270)`
-        );
-    }
-      
-    
 
-    var l_title = "Incidents by state";
-  if(!update){
     svg
-    .append("text")
-    .style("font-size", "34px")
-    .text(l_title)
-    .attr(
-      "transform",
-      `translate(${l_margin - 5},${height - l_margin - l_width - 10})`
-    );
-
+      .append("rect")
+      .attr("width", l_width)
+      .attr("height", l_height)
+      .style("fill", "transparent")
+      .style("stroke", "black")
+      .style("stroke-width", "1px")
+      .style("fill", "url('#grad1')")
+      .attr(
+        "transform",
+        `translate(${l_margin + l_height + l_spacing},${
+          height - l_margin
+        })rotate(270)`
+      );
   }
-  
-  var l_y = d3
-    .scaleLinear()
-    .domain(l_domain) 
-    .range([l_width, 0]);
 
-  if(!update){
+  var l_title = "Incidents by state";
+  if (!update) {
     svg
-    .append("g")
-    .style("font-size", "20px")
-    .attr(
-      "transform",
-      `translate(${l_margin + l_height + l_spacing},${
-        height - l_margin - l_width
-      })`
-    ) 
-    .call(d3.axisLeft().scale(l_y));
-    }
-  else{
-      svg
+      .append("text")
+      .style("font-size", "34px")
+      .text(l_title)
+      .attr(
+        "transform",
+        `translate(${l_margin - 5},${height - l_margin - l_width - 10})`
+      );
+  }
+
+  var l_y = d3.scaleLinear().domain(l_domain).range([l_width, 0]);
+
+  if (!update) {
+    svg
+      .append("g")
+      .style("font-size", "20px")
+      .attr(
+        "transform",
+        `translate(${l_margin + l_height + l_spacing},${
+          height - l_margin - l_width
+        })`
+      )
+      .call(d3.axisLeft().scale(l_y));
+  } else {
+    svg
       .select("svg.g")
       .style("font-size", "20px")
       .attr(
@@ -1158,12 +1148,12 @@ function createUSMap(data, update, years){
         `translate(${l_margin + l_height + l_spacing},${
           height - l_margin - l_width
         })`
-      ) 
-      .call(d3.axisLeft().scale(l_y));    
-    }
-    //updateMap(table_12_combination, selectedYears);
+      )
+      .call(d3.axisLeft().scale(l_y));
+  }
+  //updateMap(table_12_combination, selectedYears);
 
-    /*--------------------------*/
+  /*--------------------------*/
   /*
   .append("title")
   .text(function (d) {
@@ -1173,7 +1163,7 @@ function createUSMap(data, update, years){
   //console.log(data)
   /*
   data.forEach(function (d) {
-    
+
     if (d.state == "Total"){
       return;
     }
@@ -1187,6 +1177,55 @@ function createUSMap(data, update, years){
 */
 }
 
+function removeStateLine(stateName) {
+  stateName = stateName.replace(" ", "_");
+  d3.select("div#lineChart")
+    .select("svg")
+    .select("g.line")
+    .select("path#" + stateName)
+    .remove();
+}
+
+function appendNewStateLine(dat, stateName) {
+  stateName = stateName.replace(" ", "_");
+  const width = 1430;
+  const height = 130;
+  margin = { top: 10, right: 15, bottom: 20, left: 35 };
+  x1 = d3
+    .scaleLinear()
+    .domain(
+      d3.extent(dat, function (d) {
+        return d.year;
+      })
+    )
+    .range([50, width - margin.right]);
+
+  getBallsX = x;
+
+  y1 = d3
+    .scaleLinear()
+    .domain([0, lineMax])
+    .range([height - margin.bottom, margin.top]);
+
+  line1 = d3
+    .line()
+    .defined(function (d) {
+      return d.year;
+    })
+    .x((d) => x1(d.year))
+    .y((d) => y1(d.total));
+
+  d3.select("div#lineChart")
+    .select("svg")
+    .select("g.line")
+    .append("path")
+    .attr("id", stateName)
+    .datum(dat)
+    .attr("fill", "none")
+    .attr("stroke", "blue")
+    .attr("stroke-width", 1.5)
+    .attr("d", line1);
+}
 
 function updateMap(data) {
   //console.log(data);
@@ -1194,15 +1233,15 @@ function updateMap(data) {
   var max = getMax(data);
   //console.log(max);
   data.forEach(function (d) {
-    if (d.state == "Total"){
+    if (d.state == "Total") {
       return;
     }
     //console.log(d.value);
     d3.select("div#usMap")
       .select("svg")
       .select("path[id='" + d.line + "']")
-      .style("fill", d3.interpolateReds(d.value/max));
-    });
+      .style("fill", d3.interpolateReds(d.value / max));
+  });
   /*data.forEach(function (d) {
     if (d.state == "Total"){
       return;
@@ -1214,15 +1253,12 @@ function updateMap(data) {
   });*/
 }
 
-
 function parseDataTableMap(data, years) {
-
   var out = [];
   var out_value = 0;
   var bias_type;
   var domain_type;
   for (const [key, value] of Object.entries(data)) {
-
     out_value = 0;
     for (const [kkey, vvalue] of Object.entries(value)) {
       for (let i = 0; i < years.length; i++) {
@@ -1253,33 +1289,39 @@ function zoomed({ transform }) {
     .attr("transform", transform);
 }
 
-  function dropDownMenu(data){
-    // Create a div for the Input and its label
-    d3.select('#selectContainer').append('div').attr('id','selection');
-    d3.select("#selection").append('div').attr("class",'labelSelect').html("Select a City:");
+function dropDownMenu(data) {
+  // Create a div for the Input and its label
+  d3.select("#selectContainer").append("div").attr("id", "selection");
+  d3.select("#selection")
+    .append("div")
+    .attr("class", "labelSelect")
+    .html("Select a City:");
 
-    // Create the Select Input
-    var refSelect  = d3.select("#selection")
-            .append("select")
-            .attr('id','citySelect')
-            .on("change", changeCity);
+  // Create the Select Input
+  var refSelect = d3
+    .select("#selection")
+    .append("select")
+    .attr("id", "citySelect")
+    .on("change", changeCity);
 
-    // Set the options for the Select Input
-    var refOptions = refSelect.selectAll('option').data(allCityObjects);
-        refOptions.enter()
-            .append("option")
-            .attr("selected", function(d){
-                // logic that returns true for the city that should initially be selected, if need-be
-            })
-            .text(function(d) { return d.cityName; });
+  // Set the options for the Select Input
+  var refOptions = refSelect.selectAll("option").data(allCityObjects);
+  refOptions
+    .enter()
+    .append("option")
+    .attr("selected", function (d) {
+      // logic that returns true for the city that should initially be selected, if need-be
+    })
+    .text(function (d) {
+      return d.cityName;
+    });
 }
 
 function changeCity() {
   // Grab currently selected option
   var s = d3.select(this);
   var i = s.property("selectedIndex");
-  var d = s.selectAll('option').data()[i];
+  var d = s.selectAll("option").data()[i];
 
   // Call function that shows Tooltip for specific city 'd'
-
 }
