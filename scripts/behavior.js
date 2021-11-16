@@ -278,7 +278,8 @@ function createLollipop(data, update, years, category) {
     .select("g#x")
     .attr("transform", `translate(0, ${height})`)
     .call(d3.axisBottom(x))
-    .selectAll("text")
+    .selectAll("text#tick")
+    .attr("id", "tick")
     .attr("transform", "translate(+35,0)")
     .style("text-anchor", "end");
 
@@ -329,6 +330,29 @@ function createLollipop(data, update, years, category) {
         exit.remove();
       }
     );
+
+  svg
+    .select("g#x")
+    .append("text")
+    .attr("id", "legendaX")
+    .attr("y", height - 110)
+    .attr("x", width - 250)
+    .attr("text-anchor", "end")
+    .attr("fill", "black")
+    .attr("font-size", "12")
+    .text("Type of Crime");
+
+  svg
+    .select("g#y")
+    .append("text")
+    .attr("id", "legendaY")
+    .attr("transform", "rotate(-90)")
+    .attr("y", 15)
+    .attr("dy", "-5.1em")
+    .attr("text-anchor", "end")
+    .attr("fill", "black")
+    .attr("font-size", "12")
+    .text("Number of crimes");
 
   // Circles
   svg
