@@ -13,6 +13,17 @@ div.tooltip {
   border: 0px;
   border-radius: 8px;
 }
+div.tooltip2 {
+  position: absolute;
+  text-align: left;
+  width: 125px;
+  height: 50px;
+  padding: 2px;
+  font: 12px sans-serif;
+  background: lightsteelblue;
+  border: 0px;
+  border-radius: 8px;
+}
 
 #magicButton {
   position: absolute;
@@ -161,7 +172,7 @@ p {
   margin: 0px 0px 0px 5px;
 }
 
-#map {
+#usMap {
   grid-area: 3/11/3/21;
   margin: 0px 5px 0px 5px;
 }
