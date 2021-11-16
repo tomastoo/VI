@@ -20,6 +20,12 @@ div.tooltip {
   top: 70px;
 }
 
+#magicButton2 {
+  position: absolute;
+  left: 540px;
+  top: 70px;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -162,7 +168,7 @@ p {
   margin: 0px 0px 0px 5px;
 }
 
-#lolipop {
+#lollipop {
   grid-area: 4/1/4/11;
   margin: 0px 0px 0px 5px;
 }

@@ -1,0 +1,33 @@
+Bias motivation,Against persons,Murder,Rape,Aggravated assault,Simple assault,Intimidation,Other,Against property,Robbery,Burglary,Larceny-theft,Motor vehicle theft,Arson,Vandalism,Other,Against society
+Category,category,against persons,against persons,against persons,against persons,against persons,against persons,category,against property,against property,against property,against property,against property,against property,against property,category
+Race,2476,6,4,460,804,1194 ,8,1325,57,76 ,79 ,5,12,1079,17,15
+Anti-White,472,3,2,113,191,158 ,5,174,31,20 ,47 ,1,2,60,13,6
+Anti-Black,1759,2,2,312,507,935 ,1,959,23,49 ,19 ,3,8,856,1,6
+Anti-Native,59,1,0,13,31,12 ,2,24,3,2 ,9 ,0,0,8,2,1
+Anti-Asian,99,0,0,15,44,40 ,0,48,0,0 ,2 ,0,0,45,1,0
+Anti-Multiple,87,0,0,7,31,49 ,0,120,0,5 ,2 ,1,2,110,0,2
+Anti-Hispanic,509,1,1,143,158,205 ,1,142,20,11 ,10 ,1,3,95,2,3
+Anti-Other,285,0,0,49,84,152 ,0,110,2,2 ,8 ,3,4,89,2,1
+Religion,418,0,0,29,129,260 ,0,956,1,23 ,30 ,1,14,882,5,2
+Anti-Jewish,263,0,0,9,82,172 ,0,700,1,13 ,6 ,1,8,671,0,1
+Anti-Catholic,11,0,0,1,4,6 ,0,44,0,0 ,12 ,0,1,29,2,0
+Anti-Protestant,10,0,0,0,0,10 ,0,30,0,1 ,1 ,0,1,26,1,0
+Anti-Islamic,89,0,0,11,34,44 ,0,38,0,0 ,4 ,0,1,33,0,1
+Anti-Others,27,0,0,4,3,20 ,0,92,0,3 ,1 ,0,3,84,1,0
+Anti-Multiple,16,0,0,4,5,7 ,0,44,0,4 ,4 ,0,0,35,1,0
+Anti-Atheism,2,0,0,0,1,1 ,0,8,0,2 ,2 ,0,0,4,0,0
+Sexual Orientation,1052,1,4,227,493,325 ,2,381,44,16 ,16 ,1,8,295,1,3
+Anti-Male Homosexual,599,0,0,137,291,170 ,1,198,30,7 ,6 ,1,2,152,0,1
+Anti-Female Homosexual,161,0,4,36,73,47 ,1,54,2,4 ,3 ,0,2,43,0,1
+Anti-Homosexual,270,1,0,51,118,100 ,0,106,11,2 ,4 ,0,3,85,1,0
+Anti-Heterosexual,11,0,0,3,5,3 ,0,10,0,1 ,0 ,0,1,8,0,0
+Anti-Bisexual,11,0,0,0,6,5 ,0,13,1,2 ,3 ,0,0,7,0,1
+Disability,45,0,0,5,21,17 ,2,50,0,7 ,20 ,0,0,21,2,2
+Anti-Physical,16,0,0,3,4,9 ,0,8,0,0 ,4 ,0,0,4,0,1
+Anti-Mental,29,0,0,2,17,8 ,2,42,0,7 ,16 ,0,0,17,2,1
+Gender,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Anti-Male,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Anti-Female,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Gender Identity,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Anti-Transgender,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Anti-Gender Non-Conforming,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0

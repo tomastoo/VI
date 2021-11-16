@@ -3,10 +3,37 @@ var table_1_offenses_src = "data/table1-Offenses.csv";
 var table_1_victims_src = "data/table1-Victims.csv";
 var table_1_offenders_src = "data/table1-Known Offender.csv";
 
+var table_2_incidents_src = "data/table-2-incidents.csv";
+var table_2_offenses_src = "data/table-2-offenses.csv";
+var table_2_victims_src = "data/table-2-victims.csv";
+var table_2_offenders_src = "data/table-2-offenders.csv";
+
+var table_4_srcs = [
+  "data/table-4/table4-2005.csv",
+  "data/table-4/table4-2006.csv",
+  "data/table-4/table4-2007.csv",
+  "data/table-4/table4-2008.csv",
+  "data/table-4/table4-2009.csv",
+  "data/table-4/table4-2010.csv",
+  "data/table-4/table4-2011.csv",
+  "data/table-4/table4-2013.csv",
+  "data/table-4/table4-2014.csv",
+  "data/table-4/table4-2015.csv",
+  "data/table-4/table4-2016.csv",
+  "data/table-4/table4-2017.csv",
+  "data/table-4/table4-2018.csv",
+  "data/table-4/table4-2019.csv",
+];
+
 var table_1_incidents;
 var table_1_offenses;
 var table_1_victims;
 var table_1_offenders;
+
+var table_2_incidents;
+var table_2_offenses;
+var table_2_victims;
+var table_2_offenders;
 
 var map = "data/countries-110m.json";
 
@@ -15,8 +42,44 @@ var ballColor = "#dc3545";
 var selectedBallColor = "black";
 var lineColor = "red";
 
+var biasColors = {
+  Race: "#e31e1e",
+  "Anti-White": "red",
+  "Anti-Black": "red",
+  "Anti-Native": "red",
+  "Anti-Asian": "red",
+  "Anti-Multiple": "red",
+  "Anti-Arab": "red",
+  "Anti-Hispanic": "red",
+  "Anti-Other": "red",
+  Religion: "#a30000",
+  "Anti-Jewish": "red",
+  "Anti-Catholic": "red",
+  "Anti-Protestant": "red",
+  "Anti-Islamic": "red",
+  "Anti-Others": "red",
+  "Anti-Multiple": "red",
+  "Anti-Atheism": "red",
+  "Sexual Orientation": "#d42a2a",
+  "Anti-Male Homosexual": "red",
+  "Anti-Female Homosexual": "red",
+  "Anti-Homosexual": "red",
+  "Anti-Heterosexual": "red",
+  "Anti-Bisexual": "red",
+  Disability: "#6b0d0d",
+  "Anti-Physical": "red",
+  "Anti-Mental": "red",
+  Gender: "#000000",
+  "Anti-Male": "red",
+  "Anti-Female": "red",
+  "Gender Identity": "#a00d0d",
+  "Anti-Transgender": "red",
+  "Anti-Gender Non-Conforming": "red",
+};
+
 var tooltip;
 var topology;
+var currentLollipopCategory;
 var currentFilter;
 var lastClickedYear = 2019;
 var selectedYears = [
@@ -38,14 +101,15 @@ var selectedYears = [
 
 var getBallsX;
 
-Promise.all([d3.json(map), d3.csv(table_1_offenses_src)]).then(function ([
-  map,
-  table_1_offenses_,
-]) {
+Promise.all([
+  d3.json(map),
+  d3.csv(table_1_offenses_src),
+  d3.csv(table_2_offenses_src),
+]).then(function ([map, table_1_offenses_, table_2_offenses_]) {
   prepareInfoButtons();
 
   table_1_offenses = table_1_offenses_;
-
+  table_2_offenses = table_2_offenses_;
   topology = map;
   tooltip = d3
     .select("body")
@@ -55,9 +119,10 @@ Promise.all([d3.json(map), d3.csv(table_1_offenses_src)]).then(function ([
 
   createLineChart(table_1_offenses, false);
   changeViewNewData("offenses");
-
   createBarChart(table_1_offenses, false, selectedYears, "CATEGORY");
+  createLollipop(table_2_offenses, false, selectedYears, "category");
   currentFilter = "offenses";
+  currentLollipopCategory = "category";
 });
 
 function prepareInfoButtons() {
@@ -85,53 +150,64 @@ function prepareInfoButtons() {
 function changeViewNewData(button) {
   switch (button) {
     case "victims":
-      Promise.all([d3.csv(table_1_victims_src)]).then(function ([
-        table_1_victims_,
-      ]) {
+      Promise.all([
+        d3.csv(table_1_victims_src),
+        d3.csv(table_2_victims_src),
+      ]).then(function ([table_1_victims_, table_2_victims_]) {
         table_1_victims = table_1_victims_;
+        table_2_victims = table_2_victims_;
         unselectAllButtons();
         selectButton(button);
         createLineChart(table_1_victims, true);
         createBarChart(table_1_victims, true, selectedYears, "CATEGORY");
-
+        createLollipop(table_2_victims, true, selectedYears, "category");
         currentFilter = "victims";
       });
       break;
     case "offenders":
-      Promise.all([d3.csv(table_1_offenders_src)]).then(function ([
-        table_1_offenders_,
-      ]) {
+      Promise.all([
+        d3.csv(table_1_offenders_src),
+        d3.csv(table_2_offenders_src),
+      ]).then(function ([table_1_offenders_, table_2_offenders_]) {
         table_1_offenders = table_1_offenders_;
+        table_2_offenders = table_2_offenders_;
         unselectAllButtons();
         selectButton(button);
         createLineChart(table_1_offenders, true);
         createBarChart(table_1_offenders, true, selectedYears, "CATEGORY");
+        createLollipop(table_2_offenders, true, selectedYears, "category");
         currentFilter = "offenders";
       });
       break;
 
     case "offenses":
-      Promise.all([d3.csv(table_1_offenses_src)]).then(function ([
-        table_1_offenses_,
-      ]) {
+      Promise.all([
+        d3.csv(table_1_offenses_src),
+        d3.csv(table_2_offenses_src),
+      ]).then(function ([table_1_offenses_, table_2_offenses_]) {
         table_1_offenses = table_1_offenses_;
+        table_2_offenses = table_2_offenses_;
         unselectAllButtons();
         selectButton(button);
         createLineChart(table_1_offenses, true);
         createBarChart(table_1_offenses, true, selectedYears, "CATEGORY");
+        createLollipop(table_2_offenses, true, selectedYears, "category");
 
         currentFilter = "offenses";
       });
       break;
     case "incidents":
-      Promise.all([d3.csv(table_1_incidents_src)]).then(function ([
-        table_1_incidents_,
-      ]) {
+      Promise.all([
+        d3.csv(table_1_incidents_src),
+        d3.csv(table_2_incidents_src),
+      ]).then(function ([table_1_incidents_, table_2_incidents_]) {
         table_1_incidents = table_1_incidents_;
+        table_2_incidents = table_2_incidents_;
         unselectAllButtons();
         selectButton(button);
         createLineChart(table_1_incidents, true);
         createBarChart(table_1_incidents, true, selectedYears, "CATEGORY");
+        createLollipop(table_2_incidents, true, selectedYears, "category");
 
         currentFilter = "incidents";
       });
@@ -152,6 +228,436 @@ function unselectAllButtons() {
     .selectAll("button")
     .attr("class", "btn btn-secondary btn-sm");
 }
+/**************************************************************************************/
+
+/************************    CREATE LOLLIPOP   **************************************/
+
+function createLollipop(data, update, years, category) {
+  // set the dimensions and margins of the graph
+  const margin = { top: 10, right: 30, bottom: 90, left: 40 },
+    width = 600 - margin.left - margin.right,
+    height = 250 - margin.top - margin.bottom;
+
+  filtered_data = filterDataLolipop(data, category, years);
+  // Parse the Data
+  // console.log(filtered_data);
+  const x = d3
+    .scaleBand()
+    .range([0, width])
+    .domain(
+      filtered_data.map(function (d) {
+        return d.Crimes;
+      })
+    )
+    .padding(1);
+  var max = d3.max(out, (d) => d.Value);
+  // console.log(max);
+  const y = d3
+    .scaleLinear()
+    .domain([0, roundup(max)])
+    .range([height, 0]);
+
+  var svg = d3
+    .select("#lollipop")
+    .select("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom);
+
+  if (!update) {
+    svg = svg
+      .append("g")
+      .attr("id", "main")
+      .attr("transform", `translate(${margin.left + 30},${margin.top + 20})`);
+
+    svg.append("g").attr("id", "x");
+    svg.append("g").attr("id", "y");
+  }
+  // append the svg object to the body of the page
+  svg = svg.select("g#main");
+  svg
+    .select("g#x")
+    .attr("transform", `translate(0, ${height})`)
+    .call(d3.axisBottom(x))
+    .selectAll("text")
+    .attr("transform", "translate(+35,0)")
+    .style("text-anchor", "end");
+
+  // Add Y axis
+  svg.select("g#y").call(d3.axisLeft(y).ticks(5));
+
+  // console.log(svg.selectAll("line").data(filtered_data));
+  // Lines
+  svg
+    .selectAll("line#lolliLines")
+    .data(filtered_data)
+    .join(
+      (enter) => {
+        return enter
+          .append("line")
+          .attr("id", "lolliLines")
+          .attr("x1", function (d) {
+            return x(d.Crimes);
+          })
+          .attr("x2", function (d) {
+            return x(d.Crimes);
+          })
+          .attr("y1", function (d) {
+            return y(d.Value);
+          })
+          .attr("y2", y(0))
+          .attr("stroke", "grey")
+          .on("click", function (event, d) {
+            handleLollipopClick(d, data);
+          });
+      },
+      (update) => {
+        update
+          .attr("x1", function (d) {
+            console.log(d);
+            return x(d.Crimes);
+          })
+          .attr("x2", function (d) {
+            return x(d.Crimes);
+          })
+          .attr("y1", function (d) {
+            return y(d.Value);
+          })
+          .attr("y2", y(0))
+          .attr("stroke", "grey");
+      },
+      (exit) => {
+        exit.remove();
+      }
+    );
+
+  // Circles
+  svg
+    .selectAll("circle")
+    .data(filtered_data)
+    .join(
+      (enter) => {
+        return (
+          enter
+            .append("circle")
+            .attr("cx", function (d) {
+              return x(d.Crimes);
+            })
+            .attr("cy", function (d) {
+              return y(d.Value);
+            })
+            .attr("id", (d) => d.Crimes)
+            // .attr("r", "4")
+            // .style("fill", "#69b3a2")
+            // .attr("stroke", "black")
+            .on("click", function (event, d) {
+              handleLollipopClick(d, data);
+            })
+        );
+      },
+      (update) => {
+        update
+          .attr("cx", function (d) {
+            return x(d.Crimes);
+          })
+          .attr("cy", function (d) {
+            return y(d.Value);
+          })
+          .attr("id", (d) => d.Crimes);
+        // .attr("r", "4")
+        // .style("fill", "#69b3a2")
+        // .attr("stroke", "black");
+      },
+      (exit) => {
+        exit.remove();
+      }
+    );
+
+  changeCirclesLollipop(selectedYears, filtered_data);
+}
+
+function changeCirclesLollipop(selectedYears, filtered_data, bias) {
+  // console.log(selectedYears);
+  // console.log(filtered_data);
+  // console.log(bias);
+  var svg = d3.select("div#lollipop").select("svg").select("g#main");
+  console.log(filtered_data);
+  var promiseData = getCrossedDataTable4(selectedYears, filtered_data, bias);
+  //  console.log(promiseData);
+
+  promiseData.then((data) => {
+    //    console.log(data);
+    console.log(filtered_data);
+
+    svg
+      .selectAll("circle")
+      .data(filtered_data)
+      .attr("r", function (d) {
+        for (var i = 0; i < data.length; i++) {
+          if (d.Crimes == data[i].category) {
+            var radius = d3.scaleLinear().domain([0, 1]).range([3, 15]);
+            //        console.log(d.Crimes);
+            return radius(data[i].Value / d.Value);
+          }
+        }
+      })
+      .style("fill", function (d) {
+        for (var i = 0; i < data.length; i++) {
+          if (d.Crimes == data[i].category) {
+            // console.log(d.Crimes);
+            return biasColors[data[i].bias];
+          }
+        }
+      })
+      .attr("stroke", "black");
+  });
+}
+
+// null = Race cuz it is the biggest for all
+function getCrossedDataTable4(selectedYears, filtered_data, bias) {
+  // console.log(selectedYears);
+  // console.log(table_4_srcs[0]);
+  // console.log(filtered_data);
+  years = [];
+  var tokenPromise;
+  for (var j = 0; j < selectedYears.length; j++) {
+    for (var i = 0; i < table_4_srcs.length; i++) {
+      if (table_4_srcs[i].includes(String(selectedYears[j]))) {
+        tokenPromise = Promise.all([
+          d3.csv(table_4_srcs[i]),
+          selectedYears[j],
+          years,
+        ]).then(function ([table_4, selectedYear, years]) {
+          var year = [];
+          for (var k = 0; k < filtered_data.length; k++) {
+            // console.log(filtered_data[k].Crimes);
+            var biasAndValue = getBiasAndValue(
+              table_4,
+              filtered_data[k].Crimes,
+              bias,
+              selectedYear
+            );
+            // console.log(biasAndValue);
+            if (biasAndValue != null) {
+              year.push(biasAndValue);
+            }
+          }
+          // console.log(year);
+          if (year.lenght == 0) {
+            return;
+          }
+          years.push(year);
+          if (years.length == selectedYears.length) {
+            //console.log(years);
+            var out = years.shift();
+            //console.log(out);
+            for (var i = 0; i < years.length; i++) {
+              for (var j = 0; j < years[i].length; j++) {
+                //console.log(years[i][j]);
+                //console.log(out[j]);
+                out[j].Value += years[i][j].Value;
+                out[j].year = selectedYears;
+              }
+            }
+            // console.log(out);
+            return out;
+          }
+        });
+        // console.log(tokenPromise);
+      }
+    }
+  }
+  return tokenPromise;
+}
+
+//supostamente para o estado inicial devia ter somado as tabelas dos anos Primeiro
+// mas como é sempre race caguei e andei nao tenho tempo
+function getBiasAndValue(table, category, bias, year) {
+  // console.log(table);
+  // console.log(category);
+  // console.log(bias);
+  // console.log(year);
+  if (bias != null) {
+    table = table.filter(function (d) {
+      if (d["Bias motivation"] == bias) {
+        return d;
+      }
+    });
+  }
+  // console.log(table);
+  var max = d3.max(table, function (d) {
+    // if (d[category] != bias)
+    return parseInt(d[category]);
+  });
+  //console.log(max);
+  var element = table.filter(function (d) {
+    if (parseInt(d[category]) == max) return d;
+  });
+  if (element.length < 1) {
+    return;
+  }
+  // console.log(element);
+  var out = {};
+  out["Value"] = max;
+  out["category"] = category;
+  out["bias"] = element[0]["Bias motivation"];
+  out["year"] = year;
+  // console.log(out);
+  return out;
+}
+function filterDataForLollipopMouseHover(category) {
+  //console.log(years);
+  switch (currentFilter) {
+    case "victims":
+      return filterDataLolipop(table_2_victims, category, selectedYears);
+      break;
+    case "offenders":
+      return filterDataLolipop(table_2_offenders, category, selectedYears);
+      break;
+    case "offenses":
+      return filterDataLolipop(table_2_offenses, category, selectedYears);
+      break;
+    case "incidents":
+      return filterDataLolipop(table_2_incidents, category, selectedYears);
+      break;
+    default:
+      break;
+  }
+}
+
+function handleMouseHoverText(event, d) {
+  // console.log(d);
+  // console.log(selectedYears);
+  filtered_data = filterDataForLollipopMouseHover(currentLollipopCategory);
+  // console.log(filtered_data);
+
+  changeCirclesLollipop(selectedYears, filtered_data, d);
+}
+function handleMouseLeaveText(event, d) {
+  changeCirclesLollipop(selectedYears, filtered_data);
+}
+function handleLollipopClick(d, dataset) {
+  // console.log(d);
+  var bias_type = d.Crimes;
+
+  switch (bias_type) {
+    case "Against persons":
+      // Show barchart related to race crimes
+      // console.log("1");
+      currentLollipopCategory = "against persons";
+      createLollipop(dataset, true, selectedYears, "against persons");
+      showBackButton2();
+      break;
+    case "Against property":
+      // console.log("2");
+      currentLollipopCategory = "against property";
+      createLollipop(dataset, true, selectedYears, "against property");
+      showBackButton2();
+      break;
+    default:
+      break;
+  }
+}
+
+function showBackButton2() {
+  let element = document.getElementById("magicButton2");
+  element.removeAttribute("hidden");
+}
+function hideBackButton2() {
+  let element = document.getElementById("magicButton2");
+  element.setAttribute("hidden", "hidden");
+}
+
+function moveBackLollipop() {
+  switch (currentFilter) {
+    case "offenses":
+      Promise.all([d3.csv(table_2_offenses_src)]).then(function ([
+        table_2_offenses,
+      ]) {
+        hideBackButton2();
+        currentLollipopCategory = "category";
+        createLollipop(table_2_offenses, true, selectedYears, "category");
+      });
+      break;
+    case "victims":
+      Promise.all([d3.csv(table_2_victims_src)]).then(function ([
+        table_2_victims,
+      ]) {
+        hideBackButton2();
+        currentLollipopCategory = "category";
+        createLollipop(table_2_victims, true, selectedYears, "category");
+      });
+      break;
+    case "offenders":
+      Promise.all([d3.csv(table_2_offenders_src)]).then(function ([
+        table_2_offenders,
+      ]) {
+        hideBackButton2();
+        currentLollipopCategory = "category";
+        createLollipop(table_2_offenders, true, selectedYears, "category");
+      });
+      break;
+    case "incidents":
+      Promise.all([d3.csv(table_2_incidents_src)]).then(function ([
+        table_2_incidents,
+      ]) {
+        hideBackButton2();
+        currentLollipopCategory = "category";
+        createLollipop(table_2_incidents, true, selectedYears, "category");
+      });
+      break;
+    default:
+      break;
+  }
+}
+
+function roundup(v) {
+  var number = String(v);
+  // console.log(
+  //   number + " first n = " + number[0] + " length = " + number.length
+  // );
+  var out = "";
+  for (var i = 0; i < number.length; i++) {
+    if (i == 0) {
+      if (parseInt(number[1]) > 4) {
+        out = out + String(parseInt(number[0]) + 1);
+      } else {
+        out = out + number[0];
+        out = out + "5";
+        i++;
+      }
+    } else {
+      out = out + "0";
+    }
+  }
+  // console.log(out);
+  return parseInt(out);
+}
+
+function filterDataLolipop(data, category, years) {
+  // console.log(data);
+  out = [];
+  var data2 = data.filter(function (d) {
+    if (d.Category == category) {
+      return d;
+    }
+  });
+  console.log(data);
+  data2.forEach(function (d) {
+    var element = { Crimes: d.Crimes, Value: 0 };
+    console.log(years);
+    for (var i = 0; i < years.length; i++) {
+      element.Value += parseInt(d[years[i]]);
+    }
+    out.push(element);
+  });
+  out.sort(function (b, a) {
+    return a.Value - b.Value;
+  });
+
+  console.log(out);
+  return out;
+}
+
 /**************************************************************************************/
 
 /*************    CREATE LINE CHART   *************/
@@ -427,31 +933,39 @@ function handleLineChartClick(event, d) {
   //////////console.log(table_1_offenses);
   switch (currentFilter) {
     case "offenses":
-      Promise.all([d3.csv(table_1_offenses_src)]).then(function ([
-        table_1_offenses,
-      ]) {
+      Promise.all([
+        d3.csv(table_1_offenses_src),
+        d3.csv(table_2_offenses_src),
+      ]).then(function ([table_1_offenses, table_2_offenses]) {
         createBarChart(table_1_offenses, true, selectedYears, "CATEGORY");
+        createLollipop(table_2_offenses, true, selectedYears, "category");
       });
       break;
     case "victims":
-      Promise.all([d3.csv(table_1_victims_src)]).then(function ([
-        table_1_victims,
-      ]) {
+      Promise.all([
+        d3.csv(table_1_victims_src),
+        d3.csv(table_2_victims_src),
+      ]).then(function ([table_1_victims, table_2_victims]) {
         createBarChart(table_1_victims, true, selectedYears, "CATEGORY");
+        createLollipop(table_2_victims, true, selectedYears, "category");
       });
       break;
     case "offenders":
-      Promise.all([d3.csv(table_1_offenders_src)]).then(function ([
-        table_1_offenders,
-      ]) {
+      Promise.all([
+        d3.csv(table_1_offenders_src),
+        d3.csv(table_2_offenders_src),
+      ]).then(function ([table_1_offenders, table_2_offenders]) {
         createBarChart(table_1_offenders, true, selectedYears, "CATEGORY");
+        createLollipop(table_2_offenders, true, selectedYears, "category");
       });
       break;
     case "incidents":
-      Promise.all([d3.csv(table_1_incidents_src)]).then(function ([
-        table_1_incidents,
-      ]) {
+      Promise.all([
+        d3.csv(table_1_incidents_src),
+        d3.csv(table_2_incidents_src),
+      ]).then(function ([table_1_incidents, table_2_incidents]) {
         createBarChart(table_1_incidents, true, selectedYears, "CATEGORY");
+        createLollipop(table_2_incidents, true, selectedYears, "category");
       });
       break;
     default:
@@ -543,16 +1057,7 @@ function createBarChart(data, update, years, category) {
     return a.value - b.value;
   });
 
-  var color = d3
-    .scaleOrdinal()
-    .range([
-      "#6b486b",
-      "#a05d56",
-      "#d0743c",
-      "#ff8c00",
-      "steelblue",
-      "#2132b9",
-    ]);
+  // var color = d3.scaleOrdinal().range(biasColors);
 
   x = d3
     .scaleBand()
@@ -629,7 +1134,9 @@ function createBarChart(data, update, years, category) {
             (d) => height - margin.bottom - y((d.value - min) / range)
           )
           .style("fill", function (d, i) {
-            return color(i);
+            // console.log(d);
+            return biasColors[d.line.replace(":", "")];
+            // return color(i);
           })
           .style("opacity", 0.8)
           .attr(
@@ -656,7 +1163,7 @@ function createBarChart(data, update, years, category) {
             (d) => height - margin.bottom - y((d.value - min) / range)
           )
           .style("background-color", function (d, i) {
-            return color(i);
+            return biasColors[d.line.replace(":", "")];
           })
           .style("opacity", 0.8)
           .attr(
@@ -703,7 +1210,10 @@ function createBarChart(data, update, years, category) {
     .selectAll(".tick")
     .on("click", function (event, d) {
       handleBarClick(d, data);
-    });
+    })
+    .on("mouseover", handleMouseHoverText)
+    .on("mouseleave", handleMouseLeaveText);
+
   d3.select(".xAxis").attr("font-size", 11);
 }
 
@@ -739,6 +1249,7 @@ function handleBarClick(d, dataset) {
     case "Gender:":
       createBarChart(dataset, true, selectedYears, "GENDER");
       showBackButton();
+      break;
     case "Gender Identity:":
       createBarChart(dataset, true, selectedYears, "GENDERI");
       showBackButton();
@@ -801,6 +1312,12 @@ function handleMouseHoverLineChart(event, d) {
 }
 
 function handleMouseHover(event, d) {
+  // console.log(filtered_data);
+  // console.log(selectedYears);
+  filtered_data = filterDataForLollipopMouseHover(currentLollipopCategory);
+  console.log(filtered_data);
+
+  changeCirclesLollipop(selectedYears, filtered_data, d.line.replace(":", ""));
   tooltip.transition().duration(400).style("opacity", 1);
 
   tooltip
@@ -823,6 +1340,7 @@ function handleMouseHover(event, d) {
 }
 
 function handleMouseLeave(event, d) {
+  changeCirclesLollipop(selectedYears, filtered_data);
   tooltip.transition().duration(400).style("opacity", 0);
   d3.select("div#barChart")
     .select("svg")
