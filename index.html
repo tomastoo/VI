@@ -13,19 +13,9 @@
     <script
       language="JavaScript"
       type="text/javascript"
-      src="libs/d3.min.js"
-    ></script>
-    <script
-      language="JavaScript"
-      type="text/javascript"
       src="libs/topojson.min.js"
     ></script>
     <!-- JS -->
-    <script
-      language="JavaScript"
-      type="text/javascript"
-      src="scripts/behavior.js"
-    ></script>
 
     <script
       language="JavaScript"
@@ -152,16 +142,6 @@
           </button>
         </svg>
       </div>
-      <div class="idiom" id="radar">
-        <img id="cp4" src="radar.PNG" />
-        <img src="information.png" id="info" />
-        <div class="infoBox">
-          <p><b>SKRRRRRR</b></p>
-          <p>
-            skrr skrr
-          </p>
-        </div>
-      </div>
       <div class="idiom" id="usMap">
         <h6><b>Hate Crimes by Jurisdiction</b></h6>
         <svg>
@@ -175,6 +155,98 @@
           <!-- <div id="drawer"></div>-->
         </svg>
       </div>
+      <div class="idiom" id="radar">
+        <svg>
+          <img src="information.png" id="info" />
+          <div class="infoBox">
+            <p><b>Radar chart</b></p>
+            <p>
+              Compares the total number of offenders by race, as well as the
+              bias motivation behind those crimes. Select different races to
+              compare the types and amount of bias-motivaion crimes comited by
+              which.
+            </p>
+          </div>
+          <div id="radarTitle">
+            <h12><b>Total number of crimes by race and bias motivation</b></h12>
+          </div>
+          <div id="raceText">
+            <p>Race</p>
+          </div>
+          <!--Teste buttons dentro do svg-->
+          <div id="radarbuttons" class="idiom">
+            <button
+              id="whiteButton"
+              type="button"
+              onclick="radarbuttonClicked('white')"
+              class="btn btn-secondary btn-sm"
+              data-bs-toggle="button"
+              aria-pressed="true"
+            >
+              White
+            </button>
+            <button
+              id="blackButton"
+              type="button"
+              onclick="radarbuttonClicked('black')"
+              class="btn btn-secondary btn-sm"
+              data-bs-toggle="button"
+              aria-pressed="true"
+            >
+              Black
+            </button>
+            <button
+              id="nativeButton"
+              type="button"
+              onclick="radarbuttonClicked('native')"
+              class="btn btn-secondary btn-sm"
+              data-bs-toggle="button"
+              aria-pressed="true"
+            >
+              Native
+            </button>
+            <button
+              id="asianButton"
+              type="button"
+              onclick="radarbuttonClicked('asian')"
+              class="btn btn-secondary btn-sm"
+              data-bs-toggle="button"
+              aria-pressed="true"
+            >
+              Asian
+            </button>
+            <button
+              id="latinoButton"
+              type="button"
+              onclick="radarbuttonClicked('latino')"
+              class="btn btn-secondary btn-sm"
+              data-bs-toggle="button"
+              aria-pressed="true"
+            >
+              Latino
+            </button>
+          </div>
+        </svg>
+      </div>
     </div>
+    <script src="libs/d3.min.js"></script>
+    <script>
+      d3v7 = window.d3;
+      window.d3 = null;
+      console.log("v7 ", d3v7.version);
+    </script>
+    <script type="text/javascript" src="scripts/behavior.js"></script>
+
+    <script src="//d3js.org/d3.v3.js"></script>
+    <script>
+      //init();
+      d3version3 = d3;
+      window.d3 = null;
+      console.log("v3 ", d3version3.version);
+    </script>
+    <script type="text/javascript" src="scripts/radarChart.js"></script>
+    <script>
+      init(true);
+    </script>
   </body>
 </html>

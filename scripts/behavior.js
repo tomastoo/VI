@@ -108,10 +108,10 @@ var getBallsX;
 var lineMax = 10;
 
 Promise.all([
-  d3.json(map),
-  d3.csv(table_1_offenses_src),
-  d3.csv(table_2_offenses_src),
-  d3.csv(table_11_combination_scr),
+  d3v7.json(map),
+  d3v7.csv(table_1_offenses_src),
+  d3v7.csv(table_2_offenses_src),
+  d3v7.csv(table_11_combination_scr),
 ]).then(function ([
   map,
   table_1_offenses_,
@@ -124,7 +124,7 @@ Promise.all([
   table_2_offenses = table_2_offenses_;
   table_11_combination = table_11_combination_;
   topology = map;
-  tooltip = d3
+  tooltip = d3v7
     .select("body")
     .append("div")
     .attr("class", "tooltip")
@@ -132,7 +132,7 @@ Promise.all([
 
   //for tooltip
 
-  tooltip2 = d3
+  tooltip2 = d3v7
     .select("body")
     .append("div")
     .attr("class", "tooltip")
@@ -151,24 +151,26 @@ Promise.all([
 });
 
 function prepareInfoButtons() {
-  ////console.log("isto esta a ser chamado");
-  var a = d3.selectAll(".infoBox");
-  ////console.log(a);
-  d3.selectAll(".infoBox")
+  //////////console.log("isto esta a ser chamado");
+  var a = d3v7.selectAll(".infoBox");
+  //////////console.log(a);
+  d3v7
+    .selectAll(".infoBox")
     .style("display", "none")
     .on("mouseover", function () {
-      d3.select(this).style("display", null);
+      d3v7.select(this).style("display", null);
     })
     .on("mouseleave", function () {
-      d3.select(this).style("display", "none");
+      d3v7.select(this).style("display", "none");
     });
 
-  d3.selectAll(".idiom img")
+  d3v7
+    .selectAll(".idiom img")
     .on("mouseover", function () {
-      d3.select(this.parentNode).select(".infoBox").style("display", null);
+      d3v7.select(this.parentNode).select(".infoBox").style("display", null);
     })
     .on("mouseleave", function () {
-      d3.select(this.parentNode).select(".infoBox").style("display", "none");
+      d3v7.select(this.parentNode).select(".infoBox").style("display", "none");
     });
 }
 /***************************BUTTONS HANDLING AREA (VICTIMS, OFFENDERS, OFFENSES, INCIDENTS) **************************************/
@@ -176,8 +178,8 @@ function changeViewNewData(button) {
   switch (button) {
     case "victims":
       Promise.all([
-        d3.csv(table_1_victims_src),
-        d3.csv(table_2_victims_src),
+        d3v7.csv(table_1_victims_src),
+        d3v7.csv(table_2_victims_src),
       ]).then(function ([table_1_victims_, table_2_victims_]) {
         table_1_victims = table_1_victims_;
         table_2_victims = table_2_victims_;
@@ -192,8 +194,8 @@ function changeViewNewData(button) {
       break;
     case "offenders":
       Promise.all([
-        d3.csv(table_1_offenders_src),
-        d3.csv(table_2_offenders_src),
+        d3v7.csv(table_1_offenders_src),
+        d3v7.csv(table_2_offenders_src),
       ]).then(function ([table_1_offenders_, table_2_offenders_]) {
         table_1_offenders = table_1_offenders_;
         table_2_offenders = table_2_offenders_;
@@ -209,9 +211,9 @@ function changeViewNewData(button) {
 
     case "offenses":
       Promise.all([
-        d3.csv(table_1_offenses_src),
-        d3.csv(table_2_offenses_src),
-        d3.csv(table_11_combination_scr),
+        d3v7.csv(table_1_offenses_src),
+        d3v7.csv(table_2_offenses_src),
+        d3v7.csv(table_11_combination_scr),
       ]).then(function ([
         table_1_offenses_,
         table_2_offenses_,
@@ -234,9 +236,9 @@ function changeViewNewData(button) {
       break;
     case "incidents":
       Promise.all([
-        d3.csv(table_1_incidents_src),
-        d3.csv(table_2_incidents_src),
-        d3.csv(table_12_combination_scr),
+        d3v7.csv(table_1_incidents_src),
+        d3v7.csv(table_2_incidents_src),
+        d3v7.csv(table_12_combination_scr),
       ]).then(function ([
         table_1_incidents_,
         table_2_incidents_,
@@ -264,11 +266,11 @@ function changeViewNewData(button) {
 
 function selectButton(button) {
   var select = "button#" + button;
-  var buttonEl = d3.select(select).attr("class", "btn btn-danger btn-sm");
+  var buttonEl = d3v7.select(select).attr("class", "btn btn-danger btn-sm");
 }
 
 function unselectAllButtons() {
-  var buttonEl = d3
+  var buttonEl = d3v7
     .select("div#mainButtons")
     .selectAll("button")
     .attr("class", "btn btn-secondary btn-sm");
@@ -286,7 +288,7 @@ function createLollipop(data, update, years, category) {
   filtered_data = filterDataLolipop(data, category, years);
   // Parse the Data
   // console.log(filtered_data);
-  const x = d3
+  const x = d3v7
     .scaleBand()
     .range([0, width])
     .domain(
@@ -295,14 +297,14 @@ function createLollipop(data, update, years, category) {
       })
     )
     .padding(1);
-  var max = d3.max(out, (d) => d.Value);
+  var max = d3v7.max(out, (d) => d.Value);
   // console.log(max);
-  const y = d3
+  const y = d3v7
     .scaleLinear()
     .domain([0, roundup(max)])
     .range([height, 0]);
 
-  var svg = d3
+  var svg = d3v7
     .select("#lollipop")
     .select("svg")
     .attr("width", width + margin.left + margin.right)
@@ -322,14 +324,14 @@ function createLollipop(data, update, years, category) {
   svg
     .select("g#x")
     .attr("transform", `translate(0, ${height})`)
-    .call(d3.axisBottom(x))
+    .call(d3v7.axisBottom(x))
     .selectAll("text#tick")
     .attr("id", "tick")
     .attr("transform", "translate(+35,0)")
     .style("text-anchor", "end");
 
   // Add Y axis
-  svg.select("g#y").call(d3.axisLeft(y).ticks(5));
+  svg.select("g#y").call(d3v7.axisLeft(y).ticks(5));
 
   // console.log(svg.selectAll("line").data(filtered_data));
   // Lines
@@ -448,7 +450,7 @@ function changeCirclesLollipop(selectedYears, filtered_data, bias) {
   // console.log(selectedYears);
   // console.log(filtered_data);
   // console.log(bias);
-  var svg = d3.select("div#lollipop").select("svg").select("g#main");
+  var svg = d3v7.select("div#lollipop").select("svg").select("g#main");
   console.log(filtered_data);
   var promiseData = getCrossedDataTable4(selectedYears, filtered_data, bias);
   //  console.log(promiseData);
@@ -463,7 +465,7 @@ function changeCirclesLollipop(selectedYears, filtered_data, bias) {
       .attr("r", function (d) {
         for (var i = 0; i < data.length; i++) {
           if (d.Crimes == data[i].category) {
-            var radius = d3.scaleLinear().domain([0, 1]).range([3, 15]);
+            var radius = d3v7.scaleLinear().domain([0, 1]).range([3, 15]);
             //        console.log(d.Crimes);
             return radius(data[i].Value / d.Value);
           }
@@ -492,7 +494,7 @@ function getCrossedDataTable4(selectedYears, filtered_data, bias) {
     for (var i = 0; i < table_4_srcs.length; i++) {
       if (table_4_srcs[i].includes(String(selectedYears[j]))) {
         tokenPromise = Promise.all([
-          d3.csv(table_4_srcs[i]),
+          d3v7.csv(table_4_srcs[i]),
           selectedYears[j],
           years,
         ]).then(function ([table_4, selectedYear, years]) {
@@ -553,7 +555,7 @@ function getBiasAndValue(table, category, bias, year) {
     });
   }
   // console.log(table);
-  var max = d3.max(table, function (d) {
+  var max = d3v7.max(table, function (d) {
     // if (d[category] != bias)
     return parseInt(d[category]);
   });
@@ -639,7 +641,7 @@ function hideBackButton2() {
 function moveBackLollipop() {
   switch (currentFilter) {
     case "offenses":
-      Promise.all([d3.csv(table_2_offenses_src)]).then(function ([
+      Promise.all([d3v7.csv(table_2_offenses_src)]).then(function ([
         table_2_offenses,
       ]) {
         hideBackButton2();
@@ -648,7 +650,7 @@ function moveBackLollipop() {
       });
       break;
     case "victims":
-      Promise.all([d3.csv(table_2_victims_src)]).then(function ([
+      Promise.all([d3v7.csv(table_2_victims_src)]).then(function ([
         table_2_victims,
       ]) {
         hideBackButton2();
@@ -657,7 +659,7 @@ function moveBackLollipop() {
       });
       break;
     case "offenders":
-      Promise.all([d3.csv(table_2_offenders_src)]).then(function ([
+      Promise.all([d3v7.csv(table_2_offenders_src)]).then(function ([
         table_2_offenders,
       ]) {
         hideBackButton2();
@@ -666,7 +668,7 @@ function moveBackLollipop() {
       });
       break;
     case "incidents":
-      Promise.all([d3.csv(table_2_incidents_src)]).then(function ([
+      Promise.all([d3v7.csv(table_2_incidents_src)]).then(function ([
         table_2_incidents,
       ]) {
         hideBackButton2();
@@ -734,19 +736,19 @@ function filterDataLolipop(data, category, years) {
 /*This function converts a line from table with format |2005,..2019, singleBias|
 to |singleBias, years|*/
 function trableReformatYearsSingleBias(data) {
-  //////////console.log(data);
+  ////////////////console.log(data);
   out = [];
   for (const [key, value] of Object.entries(data)) {
     if (key != "Bias motivation" && key != "YEAROW") {
       out.push({ year: key, total: value });
     }
   }
-  // var max = d3.max(out, (d) => d.total);
+  // var max = d3v7.max(out, (d) => d.total);
   //
   // for (var i = 0; i < out.length; i++) {
   //   out[i]["norm"] = out[i].total / max;
   // }
-  //////////console.log(out);
+  ////////////////console.log(out);
   return out;
 }
 function trableReformatYearsCombination(data) {
@@ -767,8 +769,8 @@ function createLineChart(table_11, update) {
   margin = { top: 10, right: 15, bottom: 20, left: 35 };
 
   data = trableReformatYearsSingleBias(table_11[1]);
-  var max = d3.max(data, (d) => d.total);
-  line = d3
+  var max = d3v7.max(data, (d) => d.total);
+  line = d3v7
     .line()
     .defined(function (d) {
       return d.year;
@@ -777,10 +779,10 @@ function createLineChart(table_11, update) {
     .y((d) => y(d.total / max));
 
   // the domain line with the extent will make the min value the lowest year to the max
-  x = d3
+  x = d3v7
     .scaleLinear()
     .domain(
-      d3.extent(data, function (d) {
+      d3v7.extent(data, function (d) {
         return d.year;
       })
     )
@@ -788,14 +790,14 @@ function createLineChart(table_11, update) {
 
   getBallsX = x;
 
-  y = d3
+  y = d3v7
     .scaleLinear()
     .domain([0, 1])
     .range([height - margin.bottom, margin.top]);
 
   function xAxis(g) {
     g.attr("transform", `translate(0, ${height - margin.bottom})`).call(
-      d3.axisBottom(x).tickFormat((x) => x)
+      d3v7.axisBottom(x).tickFormat((x) => x)
       //.ticks(5)
     );
     //.call((g) => g.select(".domain").remove());
@@ -803,21 +805,21 @@ function createLineChart(table_11, update) {
 
   function yAxis(g) {
     g.attr("transform", `translate(${margin.left + 13}, 0)`).call(
-      d3
+      d3v7
         .axisLeft(y)
         .tickFormat((i) => Math.round(i * max))
         .ticks(5)
     );
   }
 
-  yRight = d3
+  yRight = d3v7
     .scaleLinear()
     .domain([0, lineMax])
     .range([height - margin.bottom, margin.top]);
 
   function yAxisRight(g) {
     g.attr("transform", `translate(${width - margin.right + 8}, 0)`).call(
-      d3
+      d3v7
         .axisRight(yRight)
         .tickFormat((i) => i)
         .ticks(5)
@@ -825,7 +827,7 @@ function createLineChart(table_11, update) {
   }
 
   if (!update) {
-    var line = d3
+    var line = d3v7
       .select("div#lineChart")
       .select("svg")
       //.attr("viewbox", "0 0 " + width + " " + height)
@@ -835,7 +837,7 @@ function createLineChart(table_11, update) {
       .attr("clip-path", "url(#clip)");
   }
 
-  const svg = d3
+  const svg = d3v7
     .select("div#lineChart")
     .select("svg")
     .attr("width", width)
@@ -856,8 +858,8 @@ function createLineChart(table_11, update) {
       .attr("y", 0);
 
     // Add brushing
-    var brush = d3
-      .brushX() // Add the brush feature using the d3.brush function
+    var brush = d3v7
+      .brushX() // Add the brush feature using the d3v7.brush function
       .extent([
         [0, 0],
         [width, height],
@@ -896,8 +898,11 @@ function createLineChart(table_11, update) {
     .attr("font-size", "12")
     .text("Number of crimes");
 
-  d3.select(".lineXAxis").selectAll(".tick").on("click", handleLineChartClick);
-  d3.select(".lineXAxis").attr("font-size", 13);
+  d3v7
+    .select(".lineXAxis")
+    .selectAll(".tick")
+    .on("click", handleLineChartClick);
+  d3v7.select(".lineXAxis").attr("font-size", 13);
 
   svg
     .select("path")
@@ -946,7 +951,7 @@ function handleLineChartSelection(event, d) {
   if (selection === null) return;
 
   years = [];
-  circles = d3
+  circles = d3v7
     .select("div#lineChart")
     .select("svg")
     .select("g.line")
@@ -972,31 +977,31 @@ function handleLineChartClick(event, d) {
 
   // vou chamar o desenho do linechart tal e o eixo dos x porque quero
   //     meter a bold e noutra cor o texto
-  lineChart = d3.select("div#lineChart").select("svg");
-  lineChartXaxis = d3.select(".lineXAxis");
+  lineChart = d3v7.select("div#lineChart").select("svg");
+  lineChartXaxis = d3v7.select(".lineXAxis");
 
   // Visto que a data pode vir do eixo dos anos como pode vir da bolinha
   // depende onde clicamos entao temos de uniformizar a coisa.
   if (typeof [] === typeof d) {
     if (d.year != null) {
       if (selectedYears.indexOf(d.year) == -1) selectedYears.push(d.year);
-      //////////console.log("circle click");
+      ////////////////console.log("circle click");
     } else {
-      ////////console.log(selectedYears);
-      ////////console.log("selectedYears.length = " + selectedYears.length);
+      //////////////console.log(selectedYears);
+      //////////////console.log("selectedYears.length = " + selectedYears.length);
       for (let i = 0; i < selectedYears.length; i++) {
-        ////////console.log(i);
-        //////console.log(selectedYears[i]);
+        //////////////console.log(i);
+        ////////////console.log(selectedYears[i]);
         clearLineChartSelections(selectedYears[i]);
         //after a splice if you continue the iteration i-- is necessary other wise
         // mayem will happen on deselecting years DO NOT DELETE THIS
         i--;
       }
       selectedYears = d;
-      ////////console.log("array selection");
+      //////////////console.log("array selection");
     }
   } else {
-    ////////console.log("text click");
+    //////////////console.log("text click");
     d = parseInt(d);
     if (selectedYears.indexOf(d) == -1) selectedYears.push(d);
   }
@@ -1005,7 +1010,7 @@ function handleLineChartClick(event, d) {
     lineChart
       .selectAll("circle")
       .filter(function (c) {
-        //////////console.log(c);
+        ////////////////console.log(c);
         if (clickedYear == c.year || clickedYear == c) {
           return c;
         }
@@ -1015,7 +1020,7 @@ function handleLineChartClick(event, d) {
     lineChartXaxis
       .selectAll("text")
       .filter(function (c) {
-        //console.log("c ", c);
+        ////////console.log("c ", c);
         if (c != undefined) {
           if (clickedYear == c.year || clickedYear == c) {
             return c;
@@ -1026,14 +1031,14 @@ function handleLineChartClick(event, d) {
       .style("font-weight", "bold");
   });
   var clickedYear = 2019;
-  //////////console.log(table_1_offenses);
+  ////////////////console.log(table_1_offenses);
   switch (currentFilter) {
     case "offenses":
       Promise.all([
-        d3.csv(table_1_offenses_src),
-        d3.csv(table_12_combination_scr),
-        d3.csv(table_11_combination_scr),
-        d3.csv(table_2_offenses_src),
+        d3v7.csv(table_1_offenses_src),
+        d3v7.csv(table_12_combination_scr),
+        d3v7.csv(table_11_combination_scr),
+        d3v7.csv(table_2_offenses_src),
       ]).then(function ([
         table_1_offenses,
         table_12_combination,
@@ -1051,10 +1056,10 @@ function handleLineChartClick(event, d) {
       break;
     case "victims":
       Promise.all([
-        d3.csv(table_1_victims_src),
-        d3.csv(table_12_combination_scr),
-        d3.csv(table_11_combination_scr),
-        d3.csv(table_2_victims_src),
+        d3v7.csv(table_1_victims_src),
+        d3v7.csv(table_12_combination_scr),
+        d3v7.csv(table_11_combination_scr),
+        d3v7.csv(table_2_victims_src),
       ]).then(function ([
         table_1_victims,
         table_12_combination,
@@ -1072,9 +1077,9 @@ function handleLineChartClick(event, d) {
       break;
     case "offenders":
       Promise.all([
-        d3.csv(table_1_offenders_src),
-        d3.csv(table_2_offenders_src),
-        d3.csv(table_11_combination_scr),
+        d3v7.csv(table_1_offenders_src),
+        d3v7.csv(table_2_offenders_src),
+        d3v7.csv(table_11_combination_scr),
       ]).then(function ([
         table_1_offenders,
         table_2_offenders,
@@ -1087,9 +1092,9 @@ function handleLineChartClick(event, d) {
       break;
     case "incidents":
       Promise.all([
-        d3.csv(table_1_incidents_src),
-        d3.csv(table_12_combination_scr),
-        d3.csv(table_2_incidents_src),
+        d3v7.csv(table_1_incidents_src),
+        d3v7.csv(table_12_combination_scr),
+        d3v7.csv(table_2_incidents_src),
       ]).then(function ([
         table_1_incidents,
         table_12_combination,
@@ -1123,8 +1128,8 @@ function clearLineChartSelections(year) {
   lineChartXaxis
     .selectAll("text")
     .filter(function (c) {
-      //////console.log("c", c);
-      ////console.log("year", year);
+      ////////////console.log("c", c);
+      //////////console.log("year", year);
 
       if (c != undefined) {
         if (year == c.year || year == c) {
@@ -1176,7 +1181,6 @@ function createBarChart(data, update, years, category) {
   width = 600;
 
   margin = { top: 8, right: 30, bottom: 20, left: 35 };
-
   var dict_lines = parseDataTable(data, years);
 
   filtered_data = dict_lines.filter(function (d) {
@@ -1189,9 +1193,9 @@ function createBarChart(data, update, years, category) {
     return a.value - b.value;
   });
 
-  // var color = d3.scaleOrdinal().range(biasColors);
+  // var color = d3v7.scaleOrdinal().range(biasColors);
 
-  x = d3
+  x = d3v7
     .scaleBand()
     .range([margin.left, width - margin.right])
     .domain(
@@ -1200,7 +1204,7 @@ function createBarChart(data, update, years, category) {
       })
     );
 
-  y = d3
+  y = d3v7
     .scaleLinear()
     .domain([0, 1])
     .range([height - margin.bottom, margin.top]);
@@ -1208,13 +1212,13 @@ function createBarChart(data, update, years, category) {
 
   function xAxis(g) {
     g.attr("transform", `translate(25, ${height - margin.bottom})`).call(
-      d3.axisBottom(x).ticks(6)
+      d3v7.axisBottom(x).ticks(6)
     );
   }
 
   function yAxis(g) {
     g.attr("transform", `translate(${margin.left + 25}, 0)`).call(
-      d3
+      d3v7
         .axisLeft(y)
         .tickFormat((i) => {
           return Math.round(i * lineMax);
@@ -1224,14 +1228,15 @@ function createBarChart(data, update, years, category) {
   }
 
   if (!update) {
-    d3.select("div#barChart")
+    d3v7
+      .select("div#barChart")
       .select("svg")
       .append("g")
       .attr("class", "bars")
       .attr("fill", "steelblue");
   }
 
-  const svg = d3
+  const svg = d3v7
     .select("div#barChart")
     .select("svg")
     .attr("width", width)
@@ -1278,6 +1283,7 @@ function createBarChart(data, update, years, category) {
           .on("mouseover", handleMouseHover)
           .on("mouseleave", handleMouseLeave)
           .on("click", function (event, d) {
+            //console.log("event behaviour", event);
             handleBarClick(d, data);
           });
       },
@@ -1338,7 +1344,8 @@ function createBarChart(data, update, years, category) {
     .attr("font-size", "12")
     .text("Number of crimes");
 
-  d3.select(".xAxis")
+  d3v7
+    .select(".xAxis")
     .selectAll(".tick")
     .on("click", function (event, d) {
       handleBarClick(d, data);
@@ -1346,7 +1353,7 @@ function createBarChart(data, update, years, category) {
     .on("mouseover", handleMouseHoverText)
     .on("mouseleave", handleMouseLeaveText);
 
-  d3.select(".xAxis").attr("font-size", 11);
+  d3v7.select(".xAxis").attr("font-size", 11);
 }
 
 function handleBarClick(d, dataset) {
@@ -1399,28 +1406,28 @@ function showBackButton() {
 function moveBackChart() {
   switch (currentFilter) {
     case "offenses":
-      Promise.all([d3.csv(table_1_offenses_src)]).then(function ([
+      Promise.all([d3v7.csv(table_1_offenses_src)]).then(function ([
         table_1_offenses,
       ]) {
         createBarChart(table_1_offenses, true, selectedYears, "CATEGORY");
       });
       break;
     case "victims":
-      Promise.all([d3.csv(table_1_victims_src)]).then(function ([
+      Promise.all([d3v7.csv(table_1_victims_src)]).then(function ([
         table_1_victims,
       ]) {
         createBarChart(table_1_victims, true, selectedYears, "CATEGORY");
       });
       break;
     case "offenders":
-      Promise.all([d3.csv(table_1_offenders_src)]).then(function ([
+      Promise.all([d3v7.csv(table_1_offenders_src)]).then(function ([
         table_1_offenders,
       ]) {
         createBarChart(table_1_offenders, true, selectedYears, "CATEGORY");
       });
       break;
     case "incidents":
-      Promise.all([d3.csv(table_1_incidents_src)]).then(function ([
+      Promise.all([d3v7.csv(table_1_incidents_src)]).then(function ([
         table_1_incidents,
       ]) {
         createBarChart(table_1_incidents, true, selectedYears, "CATEGORY");
@@ -1457,7 +1464,7 @@ function handleMouseHover(event, d) {
     .style("left", event.pageX + "px")
     .style("top", event.pageY + "px");
 
-  barchart = d3.select("div#barChart").select("svg");
+  barchart = d3v7.select("div#barChart").select("svg");
 
   barchart.selectAll("rect").style("opacity", 0.2);
 
@@ -1474,7 +1481,8 @@ function handleMouseHover(event, d) {
 function handleMouseLeave(event, d) {
   changeCirclesLollipop(selectedYears, filtered_data);
   tooltip.transition().duration(400).style("opacity", 0);
-  d3.select("div#barChart")
+  d3v7
+    .select("div#barChart")
     .select("svg")
     .selectAll("rect")
     .style("opacity", 0.8);
@@ -1506,11 +1514,11 @@ function createUSMap(data, update, years) {
   var offsetL = document.getElementById("usMap").offsetLeft + 10;
   var offsetT = document.getElementById("usMap").offsetTop + 10;
 
-  var path = d3.geoPath();
+  var path = d3v7.geoPath();
 
   // var dict_lines = parseDataTable(data, [2005]);
 
-  let svg = d3
+  let svg = d3v7
     .select("div#usMap")
     .select("svg")
     //.attr("height", height)
@@ -1545,7 +1553,7 @@ function createUSMap(data, update, years) {
 
         if (item != null) {
           /*
-        var mouse = d3.pointer(event)
+        var mouse = d3v7.pointer(event)
         .map( function(d) { return parseInt(d); } );
         tooltip.classed("hidden", false)
         .attr("style", "left:"+(mouse[0]+offsetL)+"px;top:"+(mouse[1]+offsetT)+"px")
@@ -1567,12 +1575,12 @@ function createUSMap(data, update, years) {
           .style("left", event.pageX + "px")
           .style("top", event.pageY - 28 + "px");*/
         }
-        if (!d3.select(this).classed("selected"))
-          d3.select(this).style("stroke-width", 2);
+        if (!d3v7.select(this).classed("selected"))
+          d3v7.select(this).style("stroke-width", 2);
       })
       .on("click", function (event, d) {
-        d3.select(this).classed("selected", function (c, i) {
-          return !d3.select(this).classed("selected");
+        d3v7.select(this).classed("selected", function (c, i) {
+          return !d3v7.select(this).classed("selected");
         });
 
         console.log(d);
@@ -1595,7 +1603,7 @@ function createUSMap(data, update, years) {
         }
 
         svg.selectAll(".selected").each(function (d, i) {
-          d3.select(this).style("stroke-width", 5);
+          d3v7.select(this).style("stroke-width", 5);
           // selectedStates.push(d.properties.name);
         });
         selectedStates.sort();
@@ -1604,7 +1612,7 @@ function createUSMap(data, update, years) {
           drawer_text += e;
           drawer_text += "</li>";
         });
-        //d3.select("#drawer").html(drawer_text);
+        //d3v7.select("#drawer").html(drawer_text);
         //add line to line chart
 
         var dir_data = parseDataTableMap(data, years);
@@ -1615,8 +1623,8 @@ function createUSMap(data, update, years) {
       });
     /*
     .on("mouseleave", function (d) {
-      if (!d3.select(this).classed("selected"))
-        d3.select(this).style("stroke-width", 1);
+      if (!d3v7.select(this).classed("selected"))
+        d3v7.select(this).style("stroke-width", 1);
     })*/
   }
   var dir_data = parseDataTableMap(data, years);
@@ -1641,10 +1649,10 @@ function createUSMap(data, update, years) {
   var l_spacing = 10;
   var l_height = 40;
   var l_width = 400;
-  var c_b = d3.scaleSequential(l_domain, d3.interpolateBlues);
+  var c_b = d3v7.scaleSequential(l_domain, d3v7.interpolateBlues);
   const n_b = Math.min(c_b.domain().length, c_b.range().length);
 
-  var c_r = d3.scaleSequential(l_domain, d3.interpolateReds);
+  var c_r = d3v7.scaleSequential(l_domain, d3v7.interpolateReds);
   const n_r = Math.min(c_r.domain().length, c_r.range().length);
 
   if (!update) {
@@ -1660,12 +1668,12 @@ function createUSMap(data, update, years) {
     grad
       .append("stop")
       .attr("offset", "0%")
-      .style("stop-color", d3.interpolateReds(0));
+      .style("stop-color", d3v7.interpolateReds(0));
 
     grad
       .append("stop")
       .attr("offset", "100%")
-      .style("stop-color", d3.interpolateReds(1));
+      .style("stop-color", d3v7.interpolateReds(1));
 
     svg
       .append("rect")
@@ -1695,7 +1703,7 @@ function createUSMap(data, update, years) {
       );
   }
 
-  var l_y = d3.scaleLinear().domain(l_domain).range([l_width, 0]);
+  var l_y = d3v7.scaleLinear().domain(l_domain).range([l_width, 0]);
 
   if (!update) {
     svg
@@ -1707,7 +1715,7 @@ function createUSMap(data, update, years) {
           height - l_margin - l_width
         })`
       )
-      .call(d3.axisLeft().scale(l_y));
+      .call(d3v7.axisLeft().scale(l_y));
   } else {
     svg
       .select("svg.g")
@@ -1718,7 +1726,7 @@ function createUSMap(data, update, years) {
           height - l_margin - l_width
         })`
       )
-      .call(d3.axisLeft().scale(l_y));
+      .call(d3v7.axisLeft().scale(l_y));
   }
   //updateMap(table_12_combination, selectedYears);
 
@@ -1738,17 +1746,18 @@ function createUSMap(data, update, years) {
     }
     console.log(d.state);
     console.log(d.cinco);
-    d3.select("div#map")
+    d3v7.select("div#map")
       .select("svg")
       .select("path[id='" + d.state + "']")
-      .style("fill", d3.interpolateBlues(d.cinco/8));
+      .style("fill", d3v7.interpolateBlues(d.cinco/8));
   });
 */
 }
 
 function removeStateLine(stateName) {
   stateName = stateName.replace(" ", "_");
-  d3.select("div#lineChart")
+  d3v7
+    .select("div#lineChart")
     .select("svg")
     .select("g.line")
     .select("path#" + stateName)
@@ -1760,10 +1769,10 @@ function appendNewStateLine(dat, stateName) {
   const width = 1430;
   const height = 130;
   margin = { top: 10, right: 15, bottom: 20, left: 35 };
-  x1 = d3
+  x1 = d3v7
     .scaleLinear()
     .domain(
-      d3.extent(dat, function (d) {
+      d3v7.extent(dat, function (d) {
         return d.year;
       })
     )
@@ -1771,12 +1780,12 @@ function appendNewStateLine(dat, stateName) {
 
   getBallsX = x;
 
-  y1 = d3
+  y1 = d3v7
     .scaleLinear()
     .domain([0, lineMax])
     .range([height - margin.bottom, margin.top]);
 
-  line1 = d3
+  line1 = d3v7
     .line()
     .defined(function (d) {
       return d.year;
@@ -1784,7 +1793,8 @@ function appendNewStateLine(dat, stateName) {
     .x((d) => x1(d.year))
     .y((d) => y1(d.total));
 
-  d3.select("div#lineChart")
+  d3v7
+    .select("div#lineChart")
     .select("svg")
     .select("g.line")
     .append("path")
@@ -1806,19 +1816,20 @@ function updateMap(data) {
       return;
     }
     //console.log(d.value);
-    d3.select("div#usMap")
+    d3v7
+      .select("div#usMap")
       .select("svg")
       .select("path[id='" + d.line + "']")
-      .style("fill", d3.interpolateReds(d.value / max));
+      .style("fill", d3v7.interpolateReds(d.value / max));
   });
   /*data.forEach(function (d) {
     if (d.state == "Total"){
       return;
     }
-    d3.select("div#usMap")
+    d3v7.select("div#usMap")
       .select("svg")
       .select("path[id='" + d.state + "']")
-      .style("fill", d3.interpolateReds(d[cincod]/8));
+      .style("fill", d3v7.interpolateReds(d[cincod]/8));
   });*/
 }
 
@@ -1846,13 +1857,15 @@ function parseDataTableMap(data, years) {
 }
 
 function addZoom() {
-  d3.select("#usMap")
+  d3v7
+    .select("#usMap")
     .selectAll("g")
-    .call(d3.zoom().scaleExtent([1, 8]).on("zoom", zoomed));
+    .call(d3v7.zoom().scaleExtent([1, 8]).on("zoom", zoomed));
 }
 
 function zoomed({ transform }) {
-  d3.select("#usMap")
+  d3v7
+    .select("#usMap")
     .selectAll("g")
     .selectAll("path")
     .attr("transform", transform);
@@ -1860,14 +1873,15 @@ function zoomed({ transform }) {
 
 function dropDownMenu(data) {
   // Create a div for the Input and its label
-  d3.select("#selectContainer").append("div").attr("id", "selection");
-  d3.select("#selection")
+  d3v7.select("#selectContainer").append("div").attr("id", "selection");
+  d3v7
+    .select("#selection")
     .append("div")
     .attr("class", "labelSelect")
     .html("Select a City:");
 
   // Create the Select Input
-  var refSelect = d3
+  var refSelect = d3v7
     .select("#selection")
     .append("select")
     .attr("id", "citySelect")
@@ -1888,7 +1902,7 @@ function dropDownMenu(data) {
 
 function changeCity() {
   // Grab currently selected option
-  var s = d3.select(this);
+  var s = d3v7.select(this);
   var i = s.property("selectedIndex");
   var d = s.selectAll("option").data()[i];
 
