@@ -14,6 +14,18 @@ div.tooltip {
   border-radius: 8px;
 }
 
+div.tooltipradar {
+  position: absolute;
+  text-align: center;
+  width: 70px;
+  height: 20px;
+  padding: 2px;
+  font: 12px sans-serif;
+  background: grey;
+  border: 0px;
+  border-radius: 8px;
+}
+
 #magicButton {
   position: absolute;
   left: 540px;
@@ -177,6 +189,58 @@ p {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+#radarTitle {
+  position: absolute;
+  left: 150px;
+}
+
+#raceText {
+  position: absolute;
+  left: 239px;
+  top: 22px;
+  height: 20px;
+}
+
+#radarbuttons {
+  display: block;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  height: 200px;
+  position: absolute;
+  left: 500px;
+  top: 50px;
+}
+
+#whiteButton {
+  opacity: 40%;
+  background-color: rgb(31, 119, 180);
+}
+
+#blackButton {
+  margin-top: 10px;
+  opacity: 40%;
+  background-color: rgb(255, 127, 14);
+}
+
+#nativeButton {
+  opacity: 40%;
+  margin-top: 10px;
+  background-color: rgb(214, 39, 40);
+}
+
+#asianButton {
+  opacity: 40%;
+  margin-top: 10px;
+  background-color: rgb(44, 160, 44);
+}
+
+#latinoButton {
+  opacity: 40%;
+  margin-top: 10px;
+  background-color: rgb(148, 103, 189);
 }
 
 #title {
